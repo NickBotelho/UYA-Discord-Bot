@@ -36,4 +36,4 @@ async def games(ctx):
     await ctx.send("```\n"+games+"```")
 
 
-client.run("ODI4ODQyMjY5MzM5NjgwNzY5.YGvdhA.cSfblOqHXP-Q-P-WJy91T8e--GU")
+client.run("ODI4ODQyMjY5MzM5NjgwNzY5.YGvdhA.F6Ho7uNMctIs27Xe-dIAdor17wI")
