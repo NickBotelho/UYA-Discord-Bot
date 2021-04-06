@@ -1,7 +1,10 @@
 def getGames(info):
     res = "No Games :(" if len(info) == 0 else "Current Games:\n"
     for game in info:
-        s = game['name'].split()
-        res+= "{}, Occupancy: ({}/{})\n".format(s[0], game['playerCount'], game['maxPlayers'])
+        host = game['players'][0]['name']
+        host+= "'s"
+        res+= "{}, Occupancy: ({}/{})\n".format(host, game['playerCount'], game['maxPlayers'])
     return res
 
+
+    
