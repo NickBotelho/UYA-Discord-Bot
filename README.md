@@ -1,1 +1,1 @@
-# UYA-Discord-Not
+# UYA-Discord-Bot
