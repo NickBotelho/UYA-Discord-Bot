@@ -1,0 +1,23 @@
+def getSmokers(smokers):
+    smokeLine = "None" if len(smokers) == 0 else "People who want to smoke:\n"
+    for person in smokers:
+        smokeLine+=person+"\n"
+    return smokeLine
+
+def pingSmokers(smokePing):
+    res = ""
+    for smoker in smokePing:
+        res+=smokePing[smoker].mention
+    return res
+
+def checkTime(smokeLine, time):
+    afk = 5 #minutes
+    afk_people = []
+    for smoker in smokeLine:
+        startTime = smokeLine[smoker]
+        if abs((time - startTime )/ 60) > afk:
+            print("found an AFK")
+            afk_people.append(smoker) 
+    for person in afk_people:
+        del smokeLine[person]
+    return smokeLine
