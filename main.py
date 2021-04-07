@@ -20,7 +20,7 @@ async def on_ready():
 
 @client.command()
 async def commands(ctx):
-    cmd = """!online - lists who is online\n"+"!total - says how many players online\n"+"!games - lists the open games\n
+    cmd = """!online - lists who is online\n!total - says how many players online\n!games - lists the open games
 !smoke - add youself to the smoke line to let others know you want to smoke. Will ping smokers when 6 people want smoke\n!smokers - see who else is waiting to play"""
     await ctx.send("```\n"+cmd+"```")
 
