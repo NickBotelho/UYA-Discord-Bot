@@ -1,39 +1,39 @@
 import requests
 import discord
-from discord.ext import commands
+from discord.ext import tasks
 from getPlayers import getPlayers
 from numPlayers import numPlayers
 from getGames import getGames
 from callServer import callGames, callPlayers
+import asyncio
+import os
 
-client = commands.Bot(command_prefix = "!")
+client = discord.Client()
+
+TOKEN = os.getenv('DISCORD_TOKEN')
+CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
+
+def getText():
+    info = callPlayers()
+    players = getPlayers(info)
+
+    gameInfo = callGames()
+    games = getGames(gameInfo)
+
+    return players + '\n```' + games + '```'
 
 @client.event
 async def on_ready():
     print("Bot is ready...")
 
-@client.command()
-async def commands(ctx):
-    cmd = "!online - lists who is online\n"+"!total - says how many players online\n"+"!games - lists the open games\n"
-    await ctx.send("```\n"+cmd+"```")
+    channel = client.get_channel(CHANNEL_ID)
 
-@client.command()
-async def online(ctx):
-    info = callPlayers()
-    players = getPlayers(info)
-    await ctx.send("```\n"+players+"```")
+	# First message
+    text = getText()
+    message = await channel.send(getText())
 
-@client.command()
-async def total(ctx):
-    info = callPlayers()
-    num = numPlayers(info)
-    await ctx.send("```\n"+num+"```")
+    while True:
+        await asyncio.sleep(1)
+        await message.edit(content=getText())
 
-@client.command()
-async def games(ctx):
-    gameInfo = callGames()
-    games = getGames(gameInfo)
-    await ctx.send("```\n"+games+"```")
-
-
-client.run("ODI4ODQyMjY5MzM5NjgwNzY5.YGvdhA.F6Ho7uNMctIs27Xe-dIAdor17wI")
+client.run(TOKEN)
