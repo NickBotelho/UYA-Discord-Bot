@@ -11,12 +11,11 @@ def pingSmokers(smokePing):
     return res
 
 def checkTime(smokeLine, time):
-    afk = 5 #minutes
+    afk = 30 #minutes
     afk_people = []
     for smoker in smokeLine:
         startTime = smokeLine[smoker]
         if abs((time - startTime )/ 60) > afk:
-            print("found an AFK")
             afk_people.append(smoker) 
     for person in afk_people:
         del smokeLine[person]
