@@ -1,17 +1,23 @@
 import requests
 import discord
 import time
+import random
+import pymongo
 from discord.ext import commands, tasks
-from getPlayers import getPlayers
+from getPlayers import getPlayers, updateOnline
 from numPlayers import numPlayers
 from getGames import getGames
 from callServer import callGames, callPlayers
 from getSmokers import getSmokers, pingSmokers, checkTime
+from mongodb import Database
+from password import botToken
 
 client = commands.Bot(command_prefix = "!")
 
+onlinePlayers = {}
 smokeLine = {} #key = user --> time in the line
 smokePing = {}#key = user --> their mention for pinging
+db = Database("uya-bot","time-played")
 
 @client.event
 async def on_ready():
@@ -21,7 +27,8 @@ async def on_ready():
 @client.command()
 async def commands(ctx):
     cmd = """!online - lists who is online\n!total - says how many players online\n!games - lists the open games
-!smoke - add youself to the smoke line to let others know you want to smoke. Will ping smokers when 6 people want smoke\n!smokers - see who else is waiting to play"""
+!smoke - add youself to the smoke line to let others know you want to smoke. Will ping smokers when 6 people want smoke\n!smokers - see who else is waiting to play
+!playtime <player> - returns the total time played (case sens | names with spaces need quotes)"""
     await ctx.send("```\n"+cmd+"```")
 
 @client.command()
@@ -63,11 +70,46 @@ async def smokers(ctx):
     playersWaiting = getSmokers(smokeLine)
     await ctx.send("```\n"+playersWaiting+"```")
 
-@tasks.loop(minutes = 5.0)
+@client.command()
+async def playtime(ctx, name):
+    global onlinePlayers
+    global db
+    stored_time = db.getTime(name, onlinePlayers)
+    res = "Player not found" if stored_time == None else "{} has played {}".format(name, stored_time)
+    await ctx.send("```\n"+res+"```")
+
+
+@tasks.loop(minutes = 1.0)
 async def daemon():
     global smokePing
     global smokeLine
+    global onlinePlayers
+    global db
     curr = time.time()
+    onlinePlayers = updateOnline(db,onlinePlayers)
+    #{'2k21': 1618103409.1592965, 'Pooper Scooper': 1618103400.4097543, 'asvpmillz': 1618103400.4721918, 'exhausted': 1618103400.5370135, 'Speedy': 1618103400.6646707} example
     if len(smokeLine) > 0:
         smokeLine = checkTime(smokeLine, curr)
-client.run("ODI4ODQyMjY5MzM5NjgwNzY5.YGvdhA.F6Ho7uNMctIs27Xe-dIAdor17wI")
+
+
+
+
+
+
+
+
+#lol
+@client.command()
+async def omega_blitzer(ctx):
+    res = ["trop should just be a big cock on the map","rumor has it he doesnt have thumbs",'Did someone say trashcan?', 
+    "what a chump", "ive met bread more intelligent", "oh yah bud?"]
+    out = res[random.randint(0, len(res)-1)]
+    await ctx.send("```\n"+out+"```")
+
+
+
+
+
+
+#replace with token
+client.run(botToken)
