@@ -13,7 +13,7 @@ class Database():
     def getCollection(self):
         return self.collection
     def addToDB(self, name):
-        name = name.toL
+        
         player = self.collection.find_one({"name":name})
         if player == None:
             self.collection.insert(
@@ -86,7 +86,36 @@ class Database():
             else:
                 return "{} Hours".format(player['time_hours'])
         return None
-    
+    def addToSmokeLine(self, name, mention, time):
+        player = self.collection.find_one({"name":name})
+        if player == None:
+            self.collection.insert(
+                {
+                    "name":name,
+                    "discord_mention":mention,
+                    "enter_time":time
+                }
+            )
+        else:
+            self.collection.find_one_and_update( #reset their time
+                {
+                    "_id":player["_id"]
+                },
+                {
+                    "$set":{
+                        "enter_time":time
+                    }
+                }
+            )
+    def getSmokersFromDB(self):
+        smokeLine = {}
+        smokePing = {}
+        for person in self.collection.find():
+            smokeLine[person['name']] = person['enter_time']
+            smokePing[person['name']] = person['discord_mention']
+        return smokeLine, smokePing
+    def deleteSmoker(self, name):
+        self.collection.delete_one({"name":name})
 
 # client = pymongo.MongoClient("mongodb+srv://nick:{}@cluster0.yhf0e.mongodb.net/UYA-Bot?retryWrites=true&w=majority".format(mongoPW))
 # print(client.list_database_names())

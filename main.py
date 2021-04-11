@@ -15,9 +15,11 @@ from password import botToken
 client = commands.Bot(command_prefix = "!")
 
 onlinePlayers = {}
-smokeLine = {} #key = user --> time in the line
-smokePing = {}#key = user --> their mention for pinging
+# smokeLine = {} #key = user --> time in the line
+# smokePing = {}#key = user --> their mention for pinging
 db = Database("uya-bot","time-played")
+smokeLineDB = Database("uya-bot", "smokeLine")
+smokeLine, smokePing = smokeLineDB.getSmokersFromDB()
 
 @client.event
 async def on_ready():
@@ -53,9 +55,11 @@ async def games(ctx):
 async def smoke(ctx):
     global smokePing
     global smokeLine
+    global smokeLineDB
     username = ctx.message.author.name
     smokePing[username] = ctx.message.author
     smokeLine[username] = time.time()
+    smokeLineDB.addToSmokeLine(username,ctx.message.author.mention,smokeLine[username])
     await ctx.send("```\n"+"You have been added to the smoke line.\nYou will automatically be taken out in 30 minutes\n"+"```\n")
     
     if len(smokeLine) >= 6:
@@ -75,7 +79,7 @@ async def playtime(ctx, name):
     global onlinePlayers
     global db
     stored_time = db.getTime(name, onlinePlayers)
-    res = "Player not found. Make sure to enter case sensitive and add quotes if name is two words i.e 'Pooper Scooper'" if stored_time == None else "{} has played {}".format(name, stored_time)
+    res = "Player not found. Make sure to enter case sensitive and add quotes if name is two words i.e \"Pooper Scooper\"" if stored_time == None else "{} has played {}".format(name, stored_time)
     await ctx.send("```\n"+res+"```")
 
 
@@ -89,7 +93,7 @@ async def daemon():
     onlinePlayers = updateOnline(db,onlinePlayers)
     #{'2k21': 1618103409.1592965, 'Pooper Scooper': 1618103400.4097543, 'asvpmillz': 1618103400.4721918, 'exhausted': 1618103400.5370135, 'Speedy': 1618103400.6646707} example
     if len(smokeLine) > 0:
-        smokeLine = checkTime(smokeLine, curr)
+        smokeLine = checkTime(smokeLineDB,smokeLine,smokePing, curr)
 
 
 

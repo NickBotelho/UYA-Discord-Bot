@@ -10,13 +10,16 @@ def pingSmokers(smokePing):
         res+=smokePing[smoker].mention
     return res
 
-def checkTime(smokeLine, time):
-    afk = 30 #minutes
+def checkTime(db, smokeLine,smokePing, time):
+    afk = 1 #minutes
     afk_people = []
     for smoker in smokeLine:
         startTime = smokeLine[smoker]
+        print(abs((time - startTime )/ 60))
         if abs((time - startTime )/ 60) > afk:
             afk_people.append(smoker) 
     for person in afk_people:
         del smokeLine[person]
+        del smokePing[person]
+        db.deleteSmoker(person)
     return smokeLine
