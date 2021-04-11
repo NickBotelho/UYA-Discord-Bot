@@ -11,7 +11,7 @@ def pingSmokers(smokePing):
     return res
 
 def checkTime(db, smokeLine,smokePing, time):
-    afk = 1 #minutes
+    afk = 30 #minutes
     afk_people = []
     for smoker in smokeLine:
         startTime = smokeLine[smoker]
