@@ -15,7 +15,6 @@ def checkTime(db, smokeLine,smokePing, time):
     afk_people = []
     for smoker in smokeLine:
         startTime = smokeLine[smoker]
-        print(abs((time - startTime )/ 60))
         if abs((time - startTime )/ 60) > afk:
             afk_people.append(smoker) 
     for person in afk_people:
