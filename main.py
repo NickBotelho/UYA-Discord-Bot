@@ -28,7 +28,7 @@ async def on_ready():
 async def commands(ctx):
     cmd = """!online - lists who is online\n!total - says how many players online\n!games - lists the open games
 !smoke - add youself to the smoke line to let others know you want to smoke. Will ping smokers when 6 people want smoke\n!smokers - see who else is waiting to play
-!playtime <player> - returns the total time played (case sens | names with spaces need quotes)"""
+!playtime <player> - returns the total time played"""
     await ctx.send("```\n"+cmd+"```")
 
 @client.command()
@@ -75,7 +75,7 @@ async def playtime(ctx, name):
     global onlinePlayers
     global db
     stored_time = db.getTime(name, onlinePlayers)
-    res = "Player not found" if stored_time == None else "{} has played {}".format(name, stored_time)
+    res = "Player not found. Make sure to enter case sensitive and add quotes if name is two words i.e 'Pooper Scooper'" if stored_time == None else "{} has played {}".format(name, stored_time)
     await ctx.send("```\n"+res+"```")
 
 

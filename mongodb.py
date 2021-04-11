@@ -13,6 +13,7 @@ class Database():
     def getCollection(self):
         return self.collection
     def addToDB(self, name):
+        name = name.toL
         player = self.collection.find_one({"name":name})
         if player == None:
             self.collection.insert(
