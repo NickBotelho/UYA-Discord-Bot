@@ -19,9 +19,9 @@ class Database():
             self.collection.insert(
                 {
                     "name":name,
-                    "numLogins":"0",
-                    "time_minutes":"0",
-                    "time_hours":"0"            
+                    "numLogins":1,
+                    "time_minutes":0,
+                    "time_hours":0            
                 }
             )
         else:
