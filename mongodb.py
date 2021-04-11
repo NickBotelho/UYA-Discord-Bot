@@ -45,6 +45,7 @@ class Database():
         id = player["_id"]
         session_time = int((abs(start-fin)/60))
         total_time = float(player["time_minutes"])
+        total_time_hours = total_time/60
         self.collection.find_one_and_update(
             {
                 "_id":id
@@ -52,7 +53,7 @@ class Database():
             {
                 "$set":{
                     "time_minutes": (total_time + session_time),
-                    "time_hours": (total_time + (session_time/60))
+                    "time_hours": (total_time_hours + (session_time/60))
                     }
             }
         )
