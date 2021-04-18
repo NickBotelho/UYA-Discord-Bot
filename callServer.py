@@ -3,7 +3,7 @@ import requests
 
 def callPlayers():
  
-    playersRes = requests.get("https://tapi.socomcommunity.com/api/universes/players?applicationId=10684e")
+    playersRes = requests.get("https://tapi.socomcommunity.com/api/universes/players?applicationId=10684")
     try:
         playersRes.raise_for_status()
         info = playersRes.json()
@@ -14,7 +14,7 @@ def callPlayers():
 
 
 def callGames():
-    gameRes = requests.get("https://tapi.socomcommunity.com/api/rooms/68e")
+    gameRes = requests.get("https://tapi.socomcommunity.com/api/rooms/68")
     try:
         gameRes.raise_for_status()
         gameInfo = gameRes.json()
