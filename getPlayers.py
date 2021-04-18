@@ -30,3 +30,5 @@ def updateOnline(db,online):
             for p in offline:
                 del online[p]
         return online
+    else:
+        return {}
