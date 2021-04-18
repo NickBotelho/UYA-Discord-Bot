@@ -85,7 +85,7 @@ class Database():
             if storedTime <= 60:
                 return "{} Minutes.".format(storedTime)
             else:
-                return "{} Hours".format(player['time_hours'])
+                return "{:.1f} Hours".format(player['time_hours'])
         return None
     def addToSmokeLine(self, name, mention, time):
         player = self.collection.find_one({"name":name})
