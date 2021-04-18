@@ -24,7 +24,7 @@ smokeLine, smokePing = smokeLineDB.getSmokersFromDB()
 @client.event
 async def on_ready():
     print("Bot is ready...")
-    #daemon.start()
+    daemon.start()
 
 @client.command()
 async def commands(ctx):
@@ -92,19 +92,19 @@ async def playtime(ctx, name):
     await ctx.send("```\n"+res+"```")
 
 
-# @tasks.loop(minutes=1.0)
-# async def daemon():
-#     global smokePing
-#     global smokeLine
-#     global onlinePlayers
-#     global db
-#     #print("Daemon on the move")
-#     smokeLine, smokePing = smokeLineDB.getSmokersFromDB()
-#     curr = time.time()
-#     onlinePlayers = updateOnline(db,onlinePlayers)
-#     #{'2k21': 1618103409.1592965, 'Pooper Scooper': 1618103400.4097543, 'asvpmillz': 1618103400.4721918, 'exhausted': 1618103400.5370135, 'Speedy': 1618103400.6646707} example
-#     if len(smokeLine) > 0:
-#         smokeLine = checkTime(smokeLineDB,smokeLine,smokePing, curr)
+@tasks.loop(minutes=1.0)
+async def daemon():
+    global smokePing
+    global smokeLine
+    global onlinePlayers
+    global db
+    #print("Daemon on the move")
+    smokeLine, smokePing = smokeLineDB.getSmokersFromDB()
+    curr = time.time()
+    onlinePlayers = updateOnline(db,onlinePlayers)
+    #{'2k21': 1618103409.1592965, 'Pooper Scooper': 1618103400.4097543, 'asvpmillz': 1618103400.4721918, 'exhausted': 1618103400.5370135, 'Speedy': 1618103400.6646707} example
+    if len(smokeLine) > 0:
+        smokeLine = checkTime(smokeLineDB,smokeLine,smokePing, curr)
 
 
 
