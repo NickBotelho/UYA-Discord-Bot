@@ -117,6 +117,14 @@ class Database():
         return smokeLine, smokePing
     def deleteSmoker(self, name):
         self.collection.delete_one({"name":name})
+    def getTop10(self, stat):
+        res = "NAME\t\t\tHOURS\n"
+        i = 0
+        for player in self.collection.find().sort([(stat,-1)]):
+            if i < 10:
+                i+=1
+                res +="{}. {}\t {:.1f}\n".format(i, player['name'], player['time_hours'])
+        return res
 
 # client = pymongo.MongoClient("mongodb+srv://nick:{}@cluster0.yhf0e.mongodb.net/UYA-Bot?retryWrites=true&w=majority".format(mongoPW))
 # print(client.list_database_names())

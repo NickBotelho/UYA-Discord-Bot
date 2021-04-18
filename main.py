@@ -30,7 +30,7 @@ async def on_ready():
 async def commands(ctx):
     cmd = """!online - lists who is online\n!total - says how many players online\n!games - lists the open games
 !smoke - add youself to the smoke line to let others know you want to smoke. Will ping smokers when 6 people want smoke\n!smokers - see who else is waiting to play
-!playtime <player> - returns the total time played"""
+!playtime <player> - returns the total time played\n!biggestSmokers - get the top 10 smokers."""
     await ctx.send("```\n"+cmd+"```")
 
 @client.command()
@@ -90,6 +90,18 @@ async def playtime(ctx, name):
     stored_time = db.getTime(name, onlinePlayers)
     res = "Player not found. Make sure to enter case sensitive and add quotes if name is two words i.e \"Pooper Scooper\"" if stored_time == None else "{} has played {}".format(name, stored_time)
     await ctx.send("```\n"+res+"```")
+
+
+@client.command()
+async def biggestSmokers(ctx):
+    global db
+    res = db.getTop10("time_minutes")
+    await ctx.send("```\n"+res+"```")
+
+
+
+
+
 
 
 @tasks.loop(minutes=1.0)

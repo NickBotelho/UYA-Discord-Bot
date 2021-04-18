@@ -5,7 +5,7 @@ def callPlayers():
  
     playersRes = requests.get("https://tapi.socomcommunity.com/api/universes/players?applicationId=10684")
     try:
-        playersRes.raise_for_status()
+        playersRes.raise_for_status() #throws error if API gets fucked up 
         info = playersRes.json()
         return info
     except: 
