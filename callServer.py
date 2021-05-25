@@ -3,7 +3,7 @@ import requests
 
 def callPlayers():
  
-    playersRes = requests.get("http://s2online.socomcommunity.com/api/universes/players?applicationId=10684")
+    playersRes = requests.get("https://s2api.socomcommunity.com/api/universes/players?applicationId=10684")
     try:
         playersRes.raise_for_status() #throws error if API gets fucked up 
         info = playersRes.json()
@@ -14,7 +14,7 @@ def callPlayers():
 
 
 def callGames():
-    gameRes = requests.get("http://s2online.socomcommunity.com/api/rooms/68")
+    gameRes = requests.get("https://s2api.socomcommunity.com/api/rooms/68")
     try:
         gameRes.raise_for_status()
         gameInfo = gameRes.json()
