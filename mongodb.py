@@ -125,6 +125,33 @@ class Database():
                 i+=1
                 res +="{}. {}\t {:.1f}\n".format(i, player['name'], player['time_hours'])
         return res
+    def updateOnlinePlayers(self, onlinePlayers, time):
+        currently_online = []
+        for name in onlinePlayers:
+            currently_online.append(name)
+            player = self.collection.find_one({"name":name})
+            if player == None:
+                self.collection.insert(
+                    {
+                        "name":name,                       
+                        "enter_time":time
+                    }
+                )
+            else:
+                self.collection.find_one_and_update( #reset their time
+                    {
+                        "_id":player["_id"]
+                    },
+                    {
+                        "$set":{
+                            "enter_time":time
+                        }
+                    }
+                )
+        for player in self.collection.find():
+            if player['name'] not in currently_online:
+                self.deleteSmoker(player['name'])
+        
 
 # client = pymongo.MongoClient("mongodb+srv://nick:{}@cluster0.yhf0e.mongodb.net/UYA-Bot?retryWrites=true&w=majority".format(mongoPW))
 # print(client.list_database_names())

@@ -19,6 +19,7 @@ onlinePlayers = {}
 # smokePing = {}#key = user --> their mention for pinging
 db = Database("uya-bot","time-played")
 smokeLineDB = Database("uya-bot", "smokeLine")
+onlineDB = Database('uya-bot', 'online')
 smokeLine, smokePing = smokeLineDB.getSmokersFromDB()
 
 @client.event
@@ -116,7 +117,8 @@ async def daemon():
     onlinePlayers = updateOnline(db,onlinePlayers)
     #{'2k21': 1618103409.1592965, 'Pooper Scooper': 1618103400.4097543, 'asvpmillz': 1618103400.4721918, 'exhausted': 1618103400.5370135, 'Speedy': 1618103400.6646707} example
     if len(smokeLine) > 0:
-        smokeLine = checkTime(smokeLineDB,smokeLine,smokePing, curr)
+        smokeLine = checkTime(smokeLineDB,smokeLine,smokePing, curr)   
+    onlineDB.updateOnlinePlayers(onlinePlayers, curr)
 
 
 
