@@ -4,7 +4,7 @@ from mongodb import Database
 def getPlayers(res):
     players = "Players Online:\n"
     for player in res:
-        players+= "-"+player["name"] +"\n"
+        players+= "-"+player["username"] +"\n"
     return players
 
 
@@ -13,7 +13,7 @@ def updateOnline(db,online):
     if res != "error":
         still_on = []
         for player in res:
-            name = player["name"]
+            name = player["username"]
             still_on.append(name)
             if not name in online:
                 online[name] = time.time()

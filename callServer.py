@@ -3,7 +3,7 @@ import requests
 
 def callPlayers():
  
-    playersRes = requests.get("https://s2api.socomcommunity.com/api/universes/players?applicationId=10684")
+    playersRes = requests.get("https://uya.raconline.gg/tapi/robo/players")
     try:
         playersRes.raise_for_status() #throws error if API gets fucked up 
         info = playersRes.json()
