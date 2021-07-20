@@ -1,11 +1,22 @@
 import pymongo
 from pymongo import MongoClient
 import time
-from password import mongoPW
-
+from config import MongoPW, MongoUser
+import os
+try:
+    if not MongoPW or not MongoUser:
+        MongoPW = os.environ("MongoPW")
+        MongoUser = os.environ("MongoUser")
+except:
+    print(MongoPW, MongoUser)
+    print('failed to load credentials')
+    exit(1)
 class Database():
     def __init__(self,db,collection):
-        self.client = pymongo.MongoClient("mongodb+srv://nick:noKAfcSGApcIQblv@cluster0.yhf0e.mongodb.net/UYA-Bot?retryWrites=true&w=majority")
+        if db != "UYA":
+            self.client = pymongo.MongoClient("mongodb+srv://Nick:noKAfcSGApcIQblv@cluster0.yhf0e.mongodb.net/UYA-Bot?retryWrites=true&w=majority")
+        else:
+            self.client = pymongo.MongoClient("mongodb+srv://{}:{}@cluster0.jydx7.mongodb.net/myFirstDatabase?retryWrites=true&w=majority".format(MongoUser, MongoPW))
         self.db = self.client[db]
         self.collection = self.db[collection]
     def getDB(self):
@@ -151,6 +162,19 @@ class Database():
         for player in self.collection.find():
             if player['name'] not in currently_online:
                 self.deleteSmoker(player['name'])
+    def getOnlinePlayers(self):
+        res = ['' for player in range(self.collection.count())]
+        for i, player in enumerate(self.collection.find()):
+            res[i] = player
+        return res
+    def getActiveGames(self):
+        '''return a list of mongo documents from the active games collection'''
+        res = ['' for player in range(self.collection.count())]
+        for i, game in enumerate(self.collection.find()):
+            res[i] = game
+        return res
+    def getUsername(self, id):
+        return self.collection.find_one({'account_id':id})['username']
         
 
 # client = pymongo.MongoClient("mongodb+srv://nick:{}@cluster0.yhf0e.mongodb.net/UYA-Bot?retryWrites=true&w=majority".format(mongoPW))
