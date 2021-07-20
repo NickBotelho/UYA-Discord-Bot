@@ -5,6 +5,7 @@ from config import MongoPW, MongoUser
 import os
 try:
     if not MongoPW or not MongoUser:
+        print('trying to get environment vars')
         MongoPW = os.environ("MongoPW")
         MongoUser = os.environ("MongoUser")
 except:

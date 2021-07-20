@@ -2,3 +2,4 @@ __pycache__
 .vscode
 ladderstatswide.txt
 toLadderstatswide.py
+config.py
