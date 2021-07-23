@@ -1,3 +1,4 @@
+from getGames import getGames
 import pymongo
 from pymongo import MongoClient
 import time
@@ -176,6 +177,76 @@ class Database():
         return res
     def getUsername(self, id):
         return self.collection.find_one({'account_id':id})['username']
+    def getPlayerBasicStats(self, username):
+        player = self.collection.find_one({'username':username})
+        res = player['stats']['overall']
+        return res
+    def getPlayerAdvancedStats(self, username):
+        player = self.collection.find_one({'username':username})
+        overall = player['stats']['overall']
+        ctf = player['stats']['ctf']
+        weapons = player['stats']['weapons']
+        kills=overall['kills']
+        deaths=overall['deaths']
+        wins=overall['wins']
+        losses=overall['losses']
+        flux_kills=weapons['flux_kills']
+        blitz_kills=weapons['blitz_kills']
+        caps = ctf['ctf_caps']
+        saves = ctf['ctf_saves']
+        res = {
+            'k/d':round(kills/deaths,2),
+            'w/l':round(wins/losses,2),
+            'caps':caps,
+            'saves':saves,
+            'flux_usage':(round(flux_kills/kills, 2) * 100),
+            'flux/blitz':round(flux_kills/blitz_kills, 2)
+        }
+        return res
+    def exists(self, username):
+        player = self.collection.find_one({'username':username})
+        return player != None
+    def updateDiscordAnalytics(self, commands):
+        '''commands is a list of the number of calls for a given command
+        0 = online calls
+        1 = game calls
+        2 = basic stats
+        3 = advanced stats'''
+        entry = self.collection.find_one({"name":"Discord Bot"})
+        if entry == None:
+            self.collection.insert_one(
+                {
+                    "name":"Discord Bot",
+                    'online_calls':0,
+                    'game_calls':0,
+                    'basic_stat_calls':0,            
+                    'advanced_stat_calls':0
+                }
+            )
+        else:
+            
+            onlineCalls = int(entry['online_calls'])
+            onlineCalls+=commands[0]
+            gameCalls = int(entry['game_calls'])
+            gameCalls+=commands[1]
+            basicStatCalls = int(entry['basic_stat_calls'])
+            basicStatCalls += commands[2]
+            advancedStatCalls = int(entry['advanced_stat_calls'])
+            advancedStatCalls += commands[3]
+            self.collection.find_one_and_update(
+                {
+                    'name':"Discord Bot"
+                },
+                {
+                    "$set":{
+                        'online_calls':onlineCalls,
+                        'game_calls':gameCalls,
+                        'basic_stat_calls':basicStatCalls,
+                        'advanced_stat_calls':advancedStatCalls
+                    }
+                }
+            )
+
         
 
 # client = pymongo.MongoClient("mongodb+srv://nick:{}@cluster0.yhf0e.mongodb.net/UYA-Bot?retryWrites=true&w=majority".format(mongoPW))

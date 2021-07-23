@@ -1,3 +1,4 @@
+from discord import player
 import requests
 import discord
 import time
@@ -13,6 +14,7 @@ from mongodb import Database
 from config import botToken
 from MapImages import MAP_IMAGES
 import os
+from StatList import BasicStatList, AdvancedStatList
 try:
     if not botToken:
         botToken = os.environ("botToken")
@@ -22,42 +24,29 @@ except:
 
 client = commands.Bot(command_prefix = "!")
 
-onlinePlayers = {}
-# smokeLine = {} #key = user --> time in the line
-# smokePing = {}#key = user --> their mention for pinging
-# smokeLineDB = Database("uya-bot", "smokeLine")
-# smokeLine, smokePing = smokeLineDB.getSmokersFromDB()
+onlineCalls, gameCalls, basicStatCalls, advancedStatCalls = 0, 0, 0, 0
 
 
 player_stats = Database("UYA","Player_Stats")
 players_online = Database("UYA","Players_Online")
 game_history = Database("UYA", "Game_History")
 games_active = Database("UYA","Games_Active")
+api_analytics = Database("UYA","API_Analytics")
 
 
 @client.event
 async def on_ready():
     print("Bot is ready...")
-    # daemon.start()
+    daemon.start()
 
-# @client.command()
-# async def commands(ctx):
-#     cmd = """!online - lists who is online\n!total - says how many players online\n!games - lists the open games
-# !smoke - add youself to the smoke line to let others know you want to smoke. Will ping smokers when 6 people want smoke\n!smokers - see who else is waiting to play
-# !playtime <player> - returns the total time played\n!biggestSmokers - get the top 10 smokers."""
-#     await ctx.send("```\n"+cmd+"```")
 
-# @client.command()
-# async def online(ctx):
-#     info = callPlayers()
-#     if info != "error":
-#         players = getPlayers(info)
-#         await ctx.send("```\n"+players+"```")
-#     else:
-#         await ctx.send("```\n"+"Failed to communicate with 1up's server"+"```")
 
 @client.command()
 async def online(ctx):
+    global onlineCalls
+    onlineCalls+=1
+
+
     players = players_online.getOnlinePlayers()
     embed = discord.Embed(
         title = "Players Online",
@@ -76,6 +65,9 @@ async def online(ctx):
 
 @client.command()
 async def games(ctx):
+    global gameCalls
+    gameCalls+=1
+
     games = games_active.getActiveGames()
     embed = discord.Embed(
         title = "Games Active",
@@ -164,6 +156,55 @@ async def games(ctx):
 #     res = "Player not found. Make sure to enter case sensitive and add quotes if name is two words i.e \"Pooper Scooper\"" if stored_time == None else "{} has played {}".format(name, stored_time)
 #     await ctx.send("```\n"+res+"```")
 
+@client.command()
+async def basicStats(ctx, username):
+    global basicStatCalls
+    basicStatCalls+=1
+    embed = discord.Embed(
+        title = "Basic Stats",
+        # url = "https://socomcommunity.com/servers/10684", 
+        # description = "Players Online",
+        color=11043122
+    )
+    if player_stats.exists(username):
+        info = player_stats.getPlayerBasicStats(username)
+        res = ""
+        for stat in BasicStatList:
+            field = "{}: {}\n".format(stat, info[BasicStatList[stat]])
+            res+=field
+        embed.add_field(name = '{} Stats'.format(username), value = res)
+        embed.set_thumbnail(url='https://static.wikia.nocookie.net/logopedia/images/c/cb/Ratchet_%26_Clank_-_Up_Your_Arsenal.png/revision/latest?cb=20140112222339')
+        
+    else:
+        embed.description = "Player not found. Make sure to enter case sensitive and add quotes if name is two words i.e \"Pooper Scooper\". Or you may have to log in to sync your acocunt."
+    await ctx.send(embed =embed)
+
+@client.command()
+async def advancedStats(ctx, username):
+    global advancedStatCalls
+    advancedStatCalls+=1
+    embed = discord.Embed(
+        title = "Advanced Stats",
+        # url = "https://socomcommunity.com/servers/10684", 
+        # description = "Players Online",
+        color=11043122
+    )
+    if player_stats.exists(username):
+        info = player_stats.getPlayerAdvancedStats(username)
+        res = ""
+        for stat in AdvancedStatList:
+            field = "{}: {}\n".format(stat, info[AdvancedStatList[stat]])
+            res+=field
+        embed.add_field(name = '{} Stats'.format(username), value = res)
+        embed.set_thumbnail(url='https://static.wikia.nocookie.net/logopedia/images/c/cb/Ratchet_%26_Clank_-_Up_Your_Arsenal.png/revision/latest?cb=20140112222339')
+        
+    else:
+        embed.description = "Player not found. Make sure to enter case sensitive and add quotes if name is two words i.e \"Pooper Scooper\". Or you may have to log in to sync your acocunt."
+    await ctx.send(embed =embed)
+
+
+
+
 
 # @client.command()
 # async def biggestSmokers(ctx):
@@ -177,20 +218,14 @@ async def games(ctx):
 
 
 
-# @tasks.loop(minutes=1.0)
-# async def daemon():
-#     global smokePing
-#     global smokeLine
-#     global onlinePlayers
-#     global db
-#     #print("Daemon on the move")
-#     smokeLine, smokePing = smokeLineDB.getSmokersFromDB()
-#     curr = time.time()
-#     onlinePlayers = updateOnline(db,onlinePlayers)
-#     #{'2k21': 1618103409.1592965, 'Pooper Scooper': 1618103400.4097543, 'asvpmillz': 1618103400.4721918, 'exhausted': 1618103400.5370135, 'Speedy': 1618103400.6646707} example
-#     if len(smokeLine) > 0:
-#         smokeLine = checkTime(smokeLineDB,smokeLine,smokePing, curr)   
-#     onlineDB.updateOnlinePlayers(onlinePlayers, curr)
+@tasks.loop(minutes=1.0)
+async def daemon():
+    global onlineCalls, basicStatCalls, gameCalls, advancedStatCalls
+    commands = [onlineCalls, gameCalls, basicStatCalls, advancedStatCalls]
+    api_analytics.updateDiscordAnalytics(commands)
+    onlineCalls, gameCalls, basicStatCalls, advancedStatCalls = 0, 0, 0, 0
+
+
 
 
 
