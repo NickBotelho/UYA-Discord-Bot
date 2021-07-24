@@ -167,16 +167,17 @@ async def basicStats(ctx, username):
         color=11043122
     )
     if player_stats.exists(username):
+        realName = player_stats.getRealName(username)
         info = player_stats.getPlayerBasicStats(username)
         res = ""
         for stat in BasicStatList:
             field = "{}: {}\n".format(stat, info[BasicStatList[stat]])
             res+=field
-        embed.add_field(name = '{} Stats'.format(username), value = res)
+        embed.add_field(name = '{} Stats'.format(realName), value = res)
         embed.set_thumbnail(url='https://static.wikia.nocookie.net/logopedia/images/c/cb/Ratchet_%26_Clank_-_Up_Your_Arsenal.png/revision/latest?cb=20140112222339')
         
     else:
-        embed.description = "Player not found. Make sure to enter case sensitive and add quotes if name is two words i.e \"Pooper Scooper\". Or you may have to log in to sync your acocunt."
+        embed.description = "Player not found. Make sure to and add quotes if name is two words i.e \"Pooper Scooper\". Or you may have to log in to sync your acocunt."
     await ctx.send(embed =embed)
 
 @client.command()
@@ -190,30 +191,18 @@ async def advancedStats(ctx, username):
         color=11043122
     )
     if player_stats.exists(username):
+        realName = player_stats.getRealName(username)
         info = player_stats.getPlayerAdvancedStats(username)
         res = ""
         for stat in AdvancedStatList:
             field = "{}: {}\n".format(stat, info[AdvancedStatList[stat]])
             res+=field
-        embed.add_field(name = '{} Stats'.format(username), value = res)
+        embed.add_field(name = '{} Stats'.format(realName), value = res)
         embed.set_thumbnail(url='https://static.wikia.nocookie.net/logopedia/images/c/cb/Ratchet_%26_Clank_-_Up_Your_Arsenal.png/revision/latest?cb=20140112222339')
         
     else:
-        embed.description = "Player not found. Make sure to enter case sensitive and add quotes if name is two words i.e \"Pooper Scooper\". Or you may have to log in to sync your acocunt."
+        embed.description = "Player not found. Make sure to add quotes if name is two words i.e \"Pooper Scooper\". Or you may have to log in to sync your acocunt."
     await ctx.send(embed =embed)
-
-
-
-
-
-# @client.command()
-# async def biggestSmokers(ctx):
-#     global db
-#     res = db.getTop10("time_minutes")
-#     await ctx.send("```\n"+res+"```")
-
-
-
 
 
 

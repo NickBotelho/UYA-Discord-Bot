@@ -178,11 +178,13 @@ class Database():
     def getUsername(self, id):
         return self.collection.find_one({'account_id':id})['username']
     def getPlayerBasicStats(self, username):
-        player = self.collection.find_one({'username':username})
+        username=username.lower().strip()
+        player = self.collection.find_one({'username_lowercase':username})
         res = player['stats']['overall']
         return res
     def getPlayerAdvancedStats(self, username):
-        player = self.collection.find_one({'username':username})
+        username=username.lower().strip()
+        player = self.collection.find_one({'username_lowercase':username})
         overall = player['stats']['overall']
         ctf = player['stats']['ctf']
         weapons = player['stats']['weapons']
@@ -204,8 +206,13 @@ class Database():
         }
         return res
     def exists(self, username):
-        player = self.collection.find_one({'username':username})
+        username=username.lower().strip()
+        player = self.collection.find_one({'username_lowercase':username})
         return player != None
+    def getRealName (self, username):
+        username=username.lower().strip()
+        player = self.collection.find_one({'username_lowercase':username})
+        return None if player == None else player['username']
     def updateDiscordAnalytics(self, commands):
         '''commands is a list of the number of calls for a given command
         0 = online calls
