@@ -4,7 +4,8 @@ import time
 from config import MongoPW, MongoUser
 import os
 
-print(os.environ("MongoPW"))
+pw = os.environ("MongoPW")
+print(pw)
 try:
     if not MongoPW or not MongoUser:
         print('trying to get environment vars')
