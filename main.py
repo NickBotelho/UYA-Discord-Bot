@@ -12,7 +12,6 @@ try:
 except:
     print('failed to load bot token credentials')
     exit(1)
-print(botToken)
 client = commands.Bot(command_prefix = "!")
 
 onlineCalls, gameCalls, basicStatCalls, advancedStatCalls = 0, 0, 0, 0
