@@ -3,11 +3,10 @@ from pymongo import MongoClient
 import time
 from config import MongoPW, MongoUser
 import os
-print(os.environ['MongoPW'])
 try:
     if not MongoPW or not MongoUser:
         print('trying to get environment vars')
-        MongoPW = os.environ["MongoPw"]
+        MongoPW = os.environ["MongoPW"]
         MongoUser = os.environ["MongoUser"]
 except:
     print(MongoPW, MongoUser)
