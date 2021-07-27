@@ -8,7 +8,7 @@ import os
 from StatList import BasicStatList, AdvancedStatList
 try:
     if not botToken:
-        botToken = os.environ("botToken")
+        botToken = os.environ["botToken"]
 except:
     print('failed to load bot token credentials')
     exit(1)
