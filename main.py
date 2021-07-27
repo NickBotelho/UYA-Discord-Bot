@@ -160,5 +160,4 @@ async def daemon():
 
 
 #replace with token
-print(botToken)
 client.run(botToken)
