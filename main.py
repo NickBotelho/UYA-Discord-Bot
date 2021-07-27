@@ -1,15 +1,6 @@
 from discord import player
-import requests
 import discord
-import time
-import random
-import pymongo
 from discord.ext import commands, tasks
-from getPlayers import getPlayers, updateOnline
-from numPlayers import numPlayers
-from getGames import getGames
-from callServer import callGames, callPlayers
-from getSmokers import getSmokers, pingSmokers, checkTime
 from mongodb import Database
 from config import botToken
 from MapImages import MAP_IMAGES
@@ -107,54 +98,6 @@ async def games(ctx):
 
     await ctx.send(embed =embed)
 
-# @client.command()
-# async def total(ctx):
-#     info = callPlayers()
-#     if info != "error":
-#         num = numPlayers(info)
-#         await ctx.send("```\n"+num+"```")
-#     else:
-#         await ctx.send("```\n"+"Failed to communicate with 1up's server"+"```")
-
-# @client.command()
-# async def games(ctx):
-#     gameInfo = callGames()
-#     if gameInfo != "error":
-#         games = getGames(gameInfo)
-#         await ctx.send("```\n"+games+"```")
-#     else:
-#         await ctx.send("```\n"+"Failed to communicate with 1up's server"+"```")
-
-# @client.command(pass_context = True)
-# async def smoke(ctx):
-#     global smokePing
-#     global smokeLine
-#     global smokeLineDB
-#     username = ctx.message.author.name
-#     smokePing[username] = ctx.message.author
-#     smokeLine[username] = time.time()
-#     smokeLineDB.addToSmokeLine(username,ctx.message.author.mention,smokeLine[username])
-#     await ctx.send("```\n"+"You have been added to the smoke line.\nYou will automatically be taken out in 30 minutes\n"+"```\n")
-    
-#     if len(smokeLine) >= 6:
-#         await ctx.send("time to smoke {}".format(pingSmokers(smokePing)))
-#         smokeLine = {}
-#         smokePing = {}
-        
-# @client.command()
-# async def smokers(ctx):
-#     global smokePing
-#     global smokeLine
-#     playersWaiting = getSmokers(smokeLine)
-#     await ctx.send("```\n"+playersWaiting+"```")
-
-# @client.command()
-# async def playtime(ctx, name):
-#     global onlinePlayers
-#     global db
-#     stored_time = db.getTime(name, onlinePlayers)
-#     res = "Player not found. Make sure to enter case sensitive and add quotes if name is two words i.e \"Pooper Scooper\"" if stored_time == None else "{} has played {}".format(name, stored_time)
-#     await ctx.send("```\n"+res+"```")
 
 @client.command()
 async def basicStats(ctx, username):
@@ -213,25 +156,6 @@ async def daemon():
     commands = [onlineCalls, gameCalls, basicStatCalls, advancedStatCalls]
     api_analytics.updateDiscordAnalytics(commands)
     onlineCalls, gameCalls, basicStatCalls, advancedStatCalls = 0, 0, 0, 0
-
-
-
-
-
-
-
-
-
-
-# #lol
-# @client.command()
-# async def omega_blitzer(ctx):
-#     res = ["trop should just be a big cock on the map","rumor has it he doesnt have thumbs",'Did someone say trashcan?', 
-#     "what a chump", "ive met bread more intelligent", "oh yah bud?"]
-#     out = res[random.randint(0, len(res)-1)]
-#     await ctx.send("```\n"+out+"```")
-
-
 
 
 

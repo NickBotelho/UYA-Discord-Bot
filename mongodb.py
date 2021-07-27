@@ -1,4 +1,3 @@
-from getGames import getGames
 import pymongo
 from pymongo import MongoClient
 import time
