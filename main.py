@@ -2,14 +2,15 @@ from discord import player
 import discord
 from discord.ext import commands, tasks
 from mongodb import Database
-from config import botToken
+from config import BOT_TOKEN, CHANNEL_ID
 from MapImages import MAP_IMAGES
 import asyncio
 import os
 from StatList import BasicStatList, AdvancedStatList
 try:
-    if not botToken:
-        botToken = os.environ("botToken")
+    if not BOT_TOKEN or not CHANNEL_ID:
+        BOT_TOKEN = os.environ['BOT_TOKEN']
+        CHANNEL_ID = os.environ['CHANNEL_ID']
 except:
     print('failed to load bot token credentials')
     exit(1)
@@ -36,8 +37,6 @@ def online():
     players = players_online.getOnlinePlayers()
     embed = discord.Embed(
         title = "Players Online",
-        # url = "https://socomcommunity.com/servers/10684", 
-        # description = "Players Online",
         color=11043122
     )
     field = ""
@@ -45,7 +44,6 @@ def online():
         field+='({})\t {}\n'.format(player['status'], player['username'])
     field = "None" if len(field) == 0 else field
     embed.add_field(name ="Aquatos", value = field, inline='False')
-    # embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/en/7/73/Ratchetandclank3box.jpg")
     embed.set_thumbnail(url='https://static.wikia.nocookie.net/logopedia/images/c/cb/Ratchet_%26_Clank_-_Up_Your_Arsenal.png/revision/latest?cb=20140112222339')
     return embed
 
@@ -99,7 +97,7 @@ def getText():
 @client.event
 async def on_ready():
     print("Bot is ready...")
-    channel = client.get_channel(820792402977488948)
+    channel = client.get_channel(CHANNEL_ID)
 
     players = await channel.send(embed = online())
     game = await channel.send(embed = games())
@@ -118,4 +116,4 @@ async def on_ready():
 
 
 #replace with token
-client.run(botToken)
+client.run(BOT_TOKEN)
