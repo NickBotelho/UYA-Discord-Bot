@@ -17,22 +17,15 @@ except:
 
 client = commands.Bot(command_prefix = "!")
 
-onlineCalls, gameCalls, basicStatCalls, advancedStatCalls = 0, 0, 0, 0
 
 
-player_stats = Database("UYA","Player_Stats")
 players_online = Database("UYA","Players_Online")
-game_history = Database("UYA", "Game_History")
 games_active = Database("UYA","Games_Active")
-api_analytics = Database("UYA","API_Analytics")
 
 
 
 
 def online():
-    global onlineCalls
-    onlineCalls+=1
-
 
     players = players_online.getOnlinePlayers()
     embed = discord.Embed(
@@ -48,8 +41,7 @@ def online():
     return embed
 
 def games():
-    global gameCalls
-    gameCalls+=1
+
 
     games = games_active.getActiveGames()
     embed = discord.Embed(
@@ -90,9 +82,7 @@ def games():
 
     return embed
 
-def getText():
-    players = online()
-    return players
+
 
 @client.event
 async def on_ready():
