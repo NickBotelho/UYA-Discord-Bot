@@ -10,7 +10,7 @@ from StatList import BasicStatList, AdvancedStatList
 try:
     if not BOT_TOKEN or not CHANNEL_ID:
         BOT_TOKEN = os.environ['BOT_TOKEN']
-        CHANNEL_ID = os.environ['CHANNEL_ID']
+        CHANNEL_ID = int(os.environ['CHANNEL_ID'])
 except:
     print('failed to load bot token credentials')
     exit(1)
@@ -51,6 +51,7 @@ def games():
     )
 
     games_added = 0
+    player_stats = Database("UYA","Player_Stats")
     for game in games:
         host = player_stats.getUsername(game['details']['host']) + "'s"
         status = game['details']['status']
