@@ -21,6 +21,7 @@ client = commands.Bot(command_prefix = "!")
 
 players_online = Database("UYA","Players_Online")
 games_active = Database("UYA","Games_Active")
+player_stats = Database("UYA","Player_Stats")
 
 
 
