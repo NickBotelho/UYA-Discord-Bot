@@ -2,13 +2,13 @@ from discord import player
 import discord
 from discord.ext import commands, tasks
 from mongodb import Database
-from config import botToken
+from config import BOT_TOKEN
 from MapImages import MAP_IMAGES
 import os
 from StatList import BasicStatList, AdvancedStatList
 try:
-    if not botToken:
-        botToken = os.environ["botToken"]
+    if not BOT_TOKEN:
+        BOT_TOKEN = os.environ["BOT_TOKEN"]
 except:
     print('failed to load bot token credentials')
     exit(1)
@@ -146,7 +146,27 @@ async def advancedStats(ctx, username):
         embed.description = "Player not found. Make sure to add quotes if name is two words i.e \"Pooper Scooper\". Or you may have to log in to sync your acocunt."
     await ctx.send(embed =embed)
 
+import requests
+@client.command()
+async def test(ctx):
+    res = requests.get('http://18.237.169.148:8281/players')
+    res = res.json()
+    players = [player['username'] for player in res]
 
+    embed = discord.Embed(
+        title = "Players Online",
+        # url = "https://socomcommunity.com/servers/10684", 
+        # description = "Players Online",
+        color=11043122
+    )
+    field = ""
+    for player in players:
+        field+='{}\n'.format(player)
+    field = "None" if len(field) == 0 else field
+    embed.add_field(name ="Aquatos", value = field, inline='False')
+    # embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/en/7/73/Ratchetandclank3box.jpg")
+    embed.set_thumbnail(url='https://static.wikia.nocookie.net/logopedia/images/c/cb/Ratchet_%26_Clank_-_Up_Your_Arsenal.png/revision/latest?cb=20140112222339')
+    await ctx.send(embed = embed)
 
 
 @tasks.loop(minutes=1.0)
@@ -160,4 +180,4 @@ async def daemon():
 
 
 #replace with token
-client.run(botToken)
+client.run(BOT_TOKEN)
