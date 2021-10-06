@@ -6,7 +6,7 @@ def getGameChat():
     res = requests.get(CHAT_API)
     res = res.json()
     chat = ["{}: {}".format(message['username'], message['message']) for message in res]
-    return chat if len(chat) > 0 else None
+    return chat if len(chat) > 0 else []
 
 def updateChatEmbed():
     game_chat = getGameChat()
