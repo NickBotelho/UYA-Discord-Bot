@@ -2,3 +2,4 @@
 MongoUser = ''
 MongoPW = ''
 BOT_TOKEN = ""
+CHAT_CHANNEL = ""

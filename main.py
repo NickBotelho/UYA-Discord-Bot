@@ -2,13 +2,17 @@ from discord import player
 import discord
 from discord.ext import commands, tasks
 from mongodb import Database
-from config import BOT_TOKEN
+from config import BOT_TOKEN, CHAT_CHANNEL
 from MapImages import MAP_IMAGES
 import os
+from GameChat import getGameChat, updateChatEmbed
 from StatList import BasicStatList, AdvancedStatList
 try:
+    print("Loading Discord information")
     if not BOT_TOKEN:
         BOT_TOKEN = os.environ["BOT_TOKEN"]
+    if not CHAT_CHANNEL:
+        CHAT_CHANNEL = os.environ['CHAT_CHANNEL']
 except:
     print('failed to load bot token credentials')
     exit(1)
@@ -28,6 +32,12 @@ api_analytics = Database("UYA","API_Analytics")
 async def on_ready():
     print("Bot is ready...")
     daemon.start()
+
+
+
+    chat_channel = client.get_channel(CHAT_CHANNEL)
+    aquatos_chat = await chat_channel.send(embed = updateChatEmbed())
+    chat.start(aquatos_chat)
 
 
 
@@ -176,7 +186,9 @@ async def daemon():
     api_analytics.updateDiscordAnalytics(commands)
     onlineCalls, gameCalls, basicStatCalls, advancedStatCalls = 0, 0, 0, 0
 
-
+@tasks.loop(minutes=0.5)
+async def chat(aquatos_chat):
+    await aquatos_chat.edit(embed = updateChatEmbed())
 
 
 #replace with token
