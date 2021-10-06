@@ -13,6 +13,7 @@ try:
         BOT_TOKEN = os.environ["BOT_TOKEN"]
     if not CHAT_CHANNEL:
         CHAT_CHANNEL = os.environ['CHAT_CHANNEL']
+        CHAT_CHANNEL = int(CHAT_CHANNEL)
 except:
     print('failed to load bot token credentials')
     exit(1)
