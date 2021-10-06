@@ -5,7 +5,7 @@ from mongodb import Database
 from config import BOT_TOKEN, CHAT_CHANNEL
 from MapImages import MAP_IMAGES
 import os
-from GameChat import getGameChat, updateChatEmbed
+from GameChat import getGameChat, updateChatEmbed, updateMessages
 from StatList import BasicStatList, AdvancedStatList
 try:
     print("Loading Discord information")
@@ -37,8 +37,11 @@ async def on_ready():
 
 
     chat_channel = client.get_channel(CHAT_CHANNEL)
-    aquatos_chat = await chat_channel.send(embed = updateChatEmbed())
-    chat.start(aquatos_chat)
+    global message_stack
+    global message_history
+    message_stack = []
+    message_history = {}
+    chat.start(chat_channel)
 
 
 
@@ -188,8 +191,24 @@ async def daemon():
     onlineCalls, gameCalls, basicStatCalls, advancedStatCalls = 0, 0, 0, 0
 
 @tasks.loop(minutes=0.5)
-async def chat(aquatos_chat):
-    await aquatos_chat.edit(embed = updateChatEmbed())
+async def chat(chat_channel):
+    global message_stack
+    global message_history
+    message_stack = updateMessages(message_stack, message_history)
+    
+    if len(message_stack) > 0:
+        await chat_channel.send(embed = updateChatEmbed(message_stack))
+        for message in message_history:
+            message_history[message]+=1
+            if message_history[message] == 21:
+                del message_history[message]
+
+        for message in message_stack:
+            message_history[message] = 1
+        message_stack = []
+
+
+
 
 
 #replace with token
