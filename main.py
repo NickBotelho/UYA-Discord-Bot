@@ -33,6 +33,10 @@ api_analytics = Database("UYA","API_Analytics")
 async def on_ready():
     print("Bot is ready...")
     daemon.start()
+    global smoke_alerted
+    global smoke_cooldown
+    smoke_cooldown = 0
+    smoke_alerted = False
 
 
 
@@ -59,9 +63,12 @@ async def online(ctx):
         color=11043122
     )
     field = ""
+    num_players_online = len(players)
     for player in players:
         field+='({})\t {}\n'.format(player['status'], player['username'])
     field = "None" if len(field) == 0 else field
+    if field != "None":
+        field+="\n[Total Players: {}]\n".format(num_players_online)
     embed.add_field(name ="Aquatos", value = field, inline='False')
     # embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/en/7/73/Ratchetandclank3box.jpg")
     embed.set_thumbnail(url='https://static.wikia.nocookie.net/logopedia/images/c/cb/Ratchet_%26_Clank_-_Up_Your_Arsenal.png/revision/latest?cb=20140112222339')
@@ -177,6 +184,9 @@ async def test(ctx):
     for player in players:
         field+='{}\n'.format(player)
     field = "None" if len(field) == 0 else field
+    num_players_online = len(players)
+    if field != "None":
+        field += "\n[Total Players: {}]\n".format(num_players_online)
     embed.add_field(name ="Aquatos", value = field, inline='False')
     # embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/en/7/73/Ratchetandclank3box.jpg")
     embed.set_thumbnail(url='https://static.wikia.nocookie.net/logopedia/images/c/cb/Ratchet_%26_Clank_-_Up_Your_Arsenal.png/revision/latest?cb=20140112222339')
@@ -185,6 +195,26 @@ async def test(ctx):
 
 @tasks.loop(minutes=1.0)
 async def daemon():
+    global smoke_cooldown
+    SMOKE_THRESHOLD = 4
+
+    res = requests.get('http://18.237.169.148:8281/players')
+    res = res.json()
+    players = [player['username'] for player in res]
+    num_players_online = len(players)
+    if smoke_cooldown == 0 and num_players_online >= SMOKE_THRESHOLD:
+        aquatos = client.get_channel(357568581178884108)
+        ROLE_ID = 902044846787817472
+
+        await aquatos.send("*Sniff* *Sniff*... I smell smoke...There are {} people on!!!<@&{}>".format(num_players_online, ROLE_ID))
+        smoke_cooldown = 120
+    else:
+        smoke_cooldown = smoke_cooldown - 1 if smoke_cooldown != 0 else smoke_cooldown
+
+
+
+
+
     global onlineCalls, basicStatCalls, gameCalls, advancedStatCalls
     commands = [onlineCalls, gameCalls, basicStatCalls, advancedStatCalls]
     api_analytics.updateDiscordAnalytics(commands)
@@ -206,7 +236,6 @@ async def chat(chat_channel):
         for message in message_stack:
             message_history[message] = 1
         message_stack = []
-
 
 
 
