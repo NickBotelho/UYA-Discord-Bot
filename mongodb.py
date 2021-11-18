@@ -201,7 +201,11 @@ class Database():
             'caps':caps,
             'saves':saves,
             'flux_usage':(round(flux_kills/kills, 2) * 100),
-            'flux/blitz':round(flux_kills/blitz_kills, 2)
+            'flux/blitz':round(flux_kills/blitz_kills, 2),
+            'kills/min':player['advanced_stats']['per_min']['kills/min'],
+            'deaths/min':player['advanced_stats']['per_min']['deaths/min'],
+            'flux_kills/min':player['advanced_stats']['per_min']['flux_kills/min'],
+            'blitz_deaths/min':player['advanced_stats']['per_min']['blitz_deaths/min']
         }
         return res
     def exists(self, username):
