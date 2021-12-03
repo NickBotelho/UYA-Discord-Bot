@@ -1,3 +1,4 @@
+from logging import error
 from discord import player
 import discord
 from discord.ext import commands, tasks
@@ -7,6 +8,9 @@ from MapImages import MAP_IMAGES
 import os
 from GameChat import getGameChat, updateChatEmbed, updateMessages
 from StatList import BasicStatList, AdvancedStatList
+from itertools import permutations
+import elo as ELO
+
 try:
     print("Loading Discord information")
     if not BOT_TOKEN:
@@ -33,19 +37,35 @@ api_analytics = Database("UYA","API_Analytics")
 async def on_ready():
     print("Bot is ready...")
     daemon.start()
-    global smoke_alerted
-    global smoke_cooldown
-    smoke_cooldown = 0
-    smoke_alerted = False
+    # global smoke_alerted
+    # global smoke_cooldown
+    # smoke_cooldown = 0
+    # smoke_alerted = False
 
 
 
-    chat_channel = client.get_channel(CHAT_CHANNEL)
-    global message_stack
-    global message_history
-    message_stack = []
-    message_history = {}
-    chat.start(chat_channel)
+    # chat_channel = client.get_channel(CHAT_CHANNEL)
+    # global message_stack
+    # global message_history
+    # message_stack = []
+    # message_history = {}
+    # chat.start(chat_channel)
+
+    # global elo
+    # elo = {}
+    # with open("elos.txt", 'r') as file:
+    #     for line in file:
+    #         line = line.split(',')
+    #         name = ''
+    #         for i in range(len(line)-1):
+    #             if i > 0:
+    #                 name = name + ','+line[i]
+    #             else:
+    #                 name+=line[i]
+                
+    #         curr_elo = int(line[-1][:len(line[-1])-1])
+
+    #         elo[name] = curr_elo
 
 
 
@@ -117,6 +137,48 @@ async def games(ctx):
         embed.description = "None :("
 
     await ctx.send(embed =embed)
+
+# @client.command()
+# async def teams(ctx, idx):
+#     global elo
+#     games = games_active.getActiveGames()
+#     idx = int(idx)
+#     if idx >= len(games):
+#         #error
+#         pass
+
+#     game = games[idx]
+#     lobby = []
+#     for id in game['details']['players']:
+#             lobby.append(player_stats.getUsername(id))
+
+#     possible_teams = permutations(lobby)
+#     best = 100
+#     best_teams = None
+#     for team in list(possible_teams):
+#         elos = ELO.getLobbyElos(elo, team)
+#         diff = abs(elos[0] - elos[1])
+#         if diff < best:
+#             best_teams = team
+#             best = diff
+    
+#     mid = len(lobby)//2
+#     red = lobby[:mid]
+#     blue = lobby[mid:]
+#     confidences = ELO.getExpected(ELO.getTeamElo(elo, red), ELO.getTeamElo(elo, blue))
+
+#     embed = discord.Embed(
+#         title = "Balanced Teams",
+#         color=11043122
+#     )
+
+#     res = "Team: {}: Win Confidence {:.2f}\nTeam: {}: Win Confidence {:.2f}".format(red, confidences[0], blue, confidences[1])
+#     embed.description = res
+#     await ctx.send(embed =embed)
+
+
+    
+    
 
 
 @client.command()
@@ -195,21 +257,21 @@ async def test(ctx):
 
 @tasks.loop(minutes=1.0)
 async def daemon():
-    global smoke_cooldown
-    SMOKE_THRESHOLD = 4
+    # global smoke_cooldown
+    # SMOKE_THRESHOLD = 4
 
-    res = requests.get('http://18.237.169.148:8281/players')
-    res = res.json()
-    players = [player['username'] for player in res]
-    num_players_online = len(players)
-    if smoke_cooldown == 0 and num_players_online >= SMOKE_THRESHOLD:
-        aquatos = client.get_channel(357568581178884108)
-        ROLE_ID = 902044846787817472
+    # res = requests.get('http://18.237.169.148:8281/players')
+    # res = res.json()
+    # players = [player['username'] for player in res]
+    # num_players_online = len(players)
+    # if smoke_cooldown == 0 and num_players_online >= SMOKE_THRESHOLD:
+    #     aquatos = client.get_channel(357568581178884108)
+    #     ROLE_ID = 902044846787817472
 
-        await aquatos.send("*Sniff* *Sniff*... I smell smoke...There are {} people on!!!<@&{}>".format(num_players_online, ROLE_ID))
-        smoke_cooldown = 120
-    else:
-        smoke_cooldown = smoke_cooldown - 1 if smoke_cooldown != 0 else smoke_cooldown
+    #     await aquatos.send("*Sniff* *Sniff*... I smell smoke...There are {} people on!!!<@&{}>".format(num_players_online, ROLE_ID))
+    #     smoke_cooldown = 120
+    # else:
+    #     smoke_cooldown = smoke_cooldown - 1 if smoke_cooldown != 0 else smoke_cooldown
 
 
 
@@ -220,22 +282,22 @@ async def daemon():
     api_analytics.updateDiscordAnalytics(commands)
     onlineCalls, gameCalls, basicStatCalls, advancedStatCalls = 0, 0, 0, 0
 
-@tasks.loop(minutes=0.5)
-async def chat(chat_channel):
-    global message_stack
-    global message_history
-    message_stack = updateMessages(message_stack, message_history)
+# @tasks.loop(minutes=0.5)
+# async def chat(chat_channel):
+#     global message_stack
+#     global message_history
+#     message_stack = updateMessages(message_stack, message_history)
     
-    if len(message_stack) > 0:
-        await chat_channel.send(embed = updateChatEmbed(message_stack))
-        for message in message_history:
-            message_history[message]+=1
-            if message_history[message] == 21:
-                del message_history[message]
+#     if len(message_stack) > 0:
+#         await chat_channel.send(embed = updateChatEmbed(message_stack))
+#         for message in message_history:
+#             message_history[message]+=1
+#             if message_history[message] == 21:
+#                 del message_history[message]
 
-        for message in message_stack:
-            message_history[message] = 1
-        message_stack = []
+#         for message in message_stack:
+#             message_history[message] = 1
+#         message_stack = []
 
 
 
