@@ -9,7 +9,7 @@ import os
 from GameChat import getGameChat, updateChatEmbed, updateMessages
 from StatList import BasicStatList, AdvancedStatList
 from itertools import permutations
-import elo as ELO
+# import elo as ELO
 
 try:
     print("Loading Discord information")
