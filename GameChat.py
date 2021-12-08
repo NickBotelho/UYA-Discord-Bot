@@ -1,7 +1,7 @@
 import requests
 import discord
 
-CHAT_API = 'http://18.237.169.148:8281/chat'
+CHAT_API = 'https://uya.raconline.gg/tapi/robo/chat'
 def getGameChat():
     res = requests.get(CHAT_API)
     res = res.json()

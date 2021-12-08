@@ -60,11 +60,11 @@ async def on_ready():
     updatingPlayChannel = await chat_channel.send(embed = updatePlayEmbed([], todays_date))
     
     play_channel.start(updatingPlayChannel)
-    # global message_stack
-    # global message_history
-    # message_stack = []
-    # message_history = {}
-    # chat.start(chat_channel)
+    global message_stack
+    global message_history
+    message_stack = []
+    message_history = {}
+    chat.start(chat_channel)
 
     # global elo
     # elo = {}
@@ -293,22 +293,22 @@ async def daemon():
     api_analytics.updateDiscordAnalytics(commands)
     onlineCalls, gameCalls, basicStatCalls, advancedStatCalls = 0, 0, 0, 0
 
-# @tasks.loop(minutes=0.5)
-# async def chat(chat_channel):
-#     global message_stack
-#     global message_history
-#     message_stack = updateMessages(message_stack, message_history)
+@tasks.loop(minutes=0.5)
+async def chat(chat_channel):
+    global message_stack
+    global message_history
+    message_stack = updateMessages(message_stack, message_history)
     
-#     if len(message_stack) > 0:
-#         await chat_channel.send(embed = updateChatEmbed(message_stack))
-#         for message in message_history:
-#             message_history[message]+=1
-#             if message_history[message] == 21:
-#                 del message_history[message]
+    if len(message_stack) > 0:
+        await chat_channel.send(embed = updateChatEmbed(message_stack))
+        for message in message_history:
+            message_history[message]+=1
+            if message_history[message] == 21:
+                del message_history[message]
 
-#         for message in message_stack:
-#             message_history[message] = 1
-#         message_stack = []
+        for message in message_stack:
+            message_history[message] = 1
+        message_stack = []
 
 @tasks.loop(minutes=0.25)
 async def play_channel(chat_channel):
