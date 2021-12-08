@@ -12,6 +12,9 @@ from itertools import permutations
 from playThread import updatePlayEmbed
 # import elo as ELO
 from time import strftime, localtime
+import time
+os.environ['TZ'] = 'EST+05EDT,M4.1.0,M10.5.0'
+time.tzset()
 try:
     print("Loading Discord information")
     if not BOT_TOKEN:
@@ -49,11 +52,12 @@ async def on_ready():
 
 
     chat_channel = client.get_channel(TODAYS_PLAYERS)
-    global play_set, daily_reset, updatingPlayChannel
+    global play_set, daily_reset, updatingPlayChannel, todays_date
     # updatingPlayChannel = chat_channel
     updatingPlayChannel = await chat_channel.send(embed = updatePlayEmbed([]))
     daily_reset = False
     play_set = []
+    todays_date = strftime("%a, %b %d", localtime())
     play_channel.start(updatingPlayChannel)
     # global message_stack
     # global message_history
@@ -307,14 +311,15 @@ async def daemon():
 
 @tasks.loop(minutes=0.25)
 async def play_channel(chat_channel):
-    global play_set, daily_reset
+    global play_set, daily_reset, todays_date
     t = int(strftime("%H", localtime()))
     if t == 5 and not daily_reset:
         play_set = []
         daily_reset = True
+        todays_date = strftime("%a, %b %d", localtime())
     elif t != 5 and daily_reset:
         daily_reset = False
-    await chat_channel.edit(embed = updatePlayEmbed(play_set))
+    await chat_channel.edit(embed = updatePlayEmbed(play_set, todays_date))
     
 @client.command()
 async def play(ctx):
