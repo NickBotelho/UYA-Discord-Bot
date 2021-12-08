@@ -54,10 +54,11 @@ async def on_ready():
     chat_channel = client.get_channel(TODAYS_PLAYERS)
     global play_set, daily_reset, updatingPlayChannel, todays_date
     # updatingPlayChannel = chat_channel
-    updatingPlayChannel = await chat_channel.send(embed = updatePlayEmbed([]))
     daily_reset = False
     play_set = []
     todays_date = strftime("%a, %b %d", localtime())
+    updatingPlayChannel = await chat_channel.send(embed = updatePlayEmbed([], todays_date))
+    
     play_channel.start(updatingPlayChannel)
     # global message_stack
     # global message_history
@@ -325,9 +326,11 @@ async def play_channel(chat_channel):
 async def play(ctx):
     global play_set
     if ctx.message.author.name in play_set:
-        pass
+        await ctx.send("```You're already in there, you addict.```")
     else:
         play_set.append(ctx.message.author.name)
+        await ctx.send("```Welcome to tonight's smoke.```")
+
 
 
 
