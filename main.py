@@ -310,7 +310,7 @@ async def daemon():
 #             message_history[message] = 1
 #         message_stack = []
 
-@tasks.loop(minutes=0.5)
+@tasks.loop(minutes=0.25)
 async def play_channel(chat_channel):
     global play_set, daily_reset, todays_date
     t = int(strftime("%H", localtime()))
