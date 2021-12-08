@@ -3,14 +3,15 @@ from discord import player
 import discord
 from discord.ext import commands, tasks
 from mongodb import Database
-from config import BOT_TOKEN, CHAT_CHANNEL
+from config import BOT_TOKEN, CHAT_CHANNEL, TODAYS_PLAYERS
 from MapImages import MAP_IMAGES
 import os
 from GameChat import getGameChat, updateChatEmbed, updateMessages
 from StatList import BasicStatList, AdvancedStatList
 from itertools import permutations
+from playThread import updatePlayEmbed
 # import elo as ELO
-
+from time import strftime, localtime
 try:
     print("Loading Discord information")
     if not BOT_TOKEN:
@@ -18,6 +19,9 @@ try:
     if not CHAT_CHANNEL:
         CHAT_CHANNEL = os.environ['CHAT_CHANNEL']
         CHAT_CHANNEL = int(CHAT_CHANNEL)
+    if not TODAYS_PLAYERS:
+        TODAYS_PLAYERS = os.environ['TODAYS_PLAYERS']
+        TODAYS_PLAYERS = int(TODAYS_PLAYERS)
 except:
     print('failed to load bot token credentials')
     exit(1)
@@ -44,7 +48,13 @@ async def on_ready():
 
 
 
-    # chat_channel = client.get_channel(CHAT_CHANNEL)
+    chat_channel = client.get_channel(TODAYS_PLAYERS)
+    global play_set, daily_reset, updatingPlayChannel
+    # updatingPlayChannel = chat_channel
+    updatingPlayChannel = await chat_channel.send(embed = updatePlayEmbed([]))
+    daily_reset = False
+    play_set = []
+    play_channel.start(updatingPlayChannel)
     # global message_stack
     # global message_history
     # message_stack = []
@@ -229,30 +239,30 @@ async def advancedStats(ctx, username):
         embed.description = "Player not found. Make sure to add quotes if name is two words i.e \"Pooper Scooper\". Or you may have to log in to sync your acocunt."
     await ctx.send(embed =embed)
 
-import requests
-@client.command()
-async def test(ctx):
-    res = requests.get('http://18.237.169.148:8281/players')
-    res = res.json()
-    players = [player['username'] for player in res]
+# import requests
+# @client.command()
+# async def test(ctx):
+#     res = requests.get('http://18.237.169.148:8281/players')
+#     res = res.json()
+#     players = [player['username'] for player in res]
 
-    embed = discord.Embed(
-        title = "Players Online",
-        # url = "https://socomcommunity.com/servers/10684", 
-        # description = "Players Online",
-        color=11043122
-    )
-    field = ""
-    for player in players:
-        field+='{}\n'.format(player)
-    field = "None" if len(field) == 0 else field
-    num_players_online = len(players)
-    if field != "None":
-        field += "\n[Total Players: {}]\n".format(num_players_online)
-    embed.add_field(name ="Aquatos", value = field, inline='False')
-    # embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/en/7/73/Ratchetandclank3box.jpg")
-    embed.set_thumbnail(url='https://static.wikia.nocookie.net/logopedia/images/c/cb/Ratchet_%26_Clank_-_Up_Your_Arsenal.png/revision/latest?cb=20140112222339')
-    await ctx.send(embed = embed)
+#     embed = discord.Embed(
+#         title = "Players Online",
+#         # url = "https://socomcommunity.com/servers/10684", 
+#         # description = "Players Online",
+#         color=11043122
+#     )
+#     field = ""
+#     for player in players:
+#         field+='{}\n'.format(player)
+#     field = "None" if len(field) == 0 else field
+#     num_players_online = len(players)
+#     if field != "None":
+#         field += "\n[Total Players: {}]\n".format(num_players_online)
+#     embed.add_field(name ="Aquatos", value = field, inline='False')
+#     # embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/en/7/73/Ratchetandclank3box.jpg")
+#     embed.set_thumbnail(url='https://static.wikia.nocookie.net/logopedia/images/c/cb/Ratchet_%26_Clank_-_Up_Your_Arsenal.png/revision/latest?cb=20140112222339')
+#     await ctx.send(embed = embed)
 
 
 @tasks.loop(minutes=1.0)
@@ -272,10 +282,6 @@ async def daemon():
     #     smoke_cooldown = 120
     # else:
     #     smoke_cooldown = smoke_cooldown - 1 if smoke_cooldown != 0 else smoke_cooldown
-
-
-
-
 
     global onlineCalls, basicStatCalls, gameCalls, advancedStatCalls
     commands = [onlineCalls, gameCalls, basicStatCalls, advancedStatCalls]
@@ -299,6 +305,21 @@ async def daemon():
 #             message_history[message] = 1
 #         message_stack = []
 
+@tasks.loop(minutes=0.25)
+async def play_channel(chat_channel):
+    global play_set, daily_reset
+    t = int(strftime("%H", localtime()))
+    if t == 5 and not daily_reset:
+        play_set = []
+        daily_reset = True
+    elif t != 5 and daily_reset:
+        daily_reset = False
+    await chat_channel.edit(embed = updatePlayEmbed(play_set))
+    
+@client.command()
+async def play(ctx):
+    global play_set
+    play_set.append(ctx.message.author.name)
 
 
 
