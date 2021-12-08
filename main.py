@@ -51,15 +51,16 @@ async def on_ready():
 
 
 
-    chat_channel = client.get_channel(TODAYS_PLAYERS)
+    play_channel = client.get_channel(TODAYS_PLAYERS)
     global play_set, daily_reset, updatingPlayChannel, todays_date
     # updatingPlayChannel = chat_channel
     daily_reset = False
     play_set = []
     todays_date = strftime("%a, %b %d", localtime())
-    updatingPlayChannel = await chat_channel.send(embed = updatePlayEmbed([], todays_date))
-    
+    updatingPlayChannel = await play_channel.send(embed = updatePlayEmbed([], todays_date))
     play_channel.start(updatingPlayChannel)
+
+    chat_channel = client.get_channel(CHAT_CHANNEL)
     global message_stack
     global message_history
     message_stack = []
