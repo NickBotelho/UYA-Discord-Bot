@@ -319,7 +319,10 @@ async def play_channel(chat_channel):
 @client.command()
 async def play(ctx):
     global play_set
-    play_set.append(ctx.message.author.name)
+    if ctx.message.author.name in play_set:
+        pass
+    else:
+        play_set.append(ctx.message.author.name)
 
 
 
