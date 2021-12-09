@@ -3,7 +3,7 @@ import discord
 
 def updatePlayEmbed(playtime_slots, time):
     chat_embed = discord.Embed(
-        title = 'Players Who Want To Play',
+        title = 'Players Who Want To Play (ET Times)',
         color=11043122
     )
 
