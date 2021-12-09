@@ -9,7 +9,7 @@ import os
 from GameChat import getGameChat, updateChatEmbed, updateMessages
 from StatList import BasicStatList, AdvancedStatList
 from itertools import permutations
-from playThread import updatePlayEmbed
+from playThread import updatePlayEmbed, checkTime, time_slots
 # import elo as ELO
 from time import strftime, localtime
 import time
@@ -52,13 +52,12 @@ async def on_ready():
 
 
     play_thread = client.get_channel(TODAYS_PLAYERS)
-    global play_set, daily_reset, updatingPlayChannel, todays_date
+    global playtime_slots, daily_reset, updatingPlayChannel, todays_date
     # updatingPlayChannel = chat_channel
     daily_reset = False
-    play_set = []
+    playtime_slots = time_slots
     todays_date = strftime("%a, %b %d", localtime())
     updatingPlayChannel = await play_thread.send(embed = updatePlayEmbed([], todays_date))
-    play_channel.start(updatingPlayChannel)
 
     chat_channel = client.get_channel(CHAT_CHANNEL)
     global message_stack
@@ -311,26 +310,42 @@ async def chat(chat_channel):
             message_history[message] = 1
         message_stack = []
 
-@tasks.loop(minutes=0.25)
-async def play_channel(chat_channel):
-    global play_set, daily_reset, todays_date
+# @tasks.loop(minutes=0.25)
+async def play_channel():
+    global playtime_slots, daily_reset, todays_date, updatingPlayChannel
     t = int(strftime("%H", localtime()))
     if t == 5 and not daily_reset:
-        play_set = []
+        playtime_slots = time_slots
         daily_reset = True
         todays_date = strftime("%a, %b %d", localtime())
     elif t != 5 and daily_reset:
         daily_reset = False
-    await chat_channel.edit(embed = updatePlayEmbed(play_set, todays_date))
+    await updatingPlayChannel.edit(embed = updatePlayEmbed(playtime_slots, todays_date))
     
 @client.command()
 async def play(ctx):
-    global play_set
-    if ctx.message.author.name in play_set:
-        await ctx.send("```You're already in there, you addict.```")
+    global playtime_slots
+    arg = ctx.message.content.split(" ")
+    if len(arg) > 1:
+        time = arg[1].lower()
+        time = time if len(time) > 2 else time + "pm"
+        if not checkTime(time):
+            await ctx.send("```Not a valid time.```")
+        else:
+            if ctx.message.author.name in playtime_slots[time]:
+                await ctx.send("```You're already in there, you addict.```")
+            else:
+                playtime_slots[time].append(ctx.message.author.name)
+                await ctx.send("```Welcome to tonight's smoke.```")
     else:
-        play_set.append(ctx.message.author.name)
-        await ctx.send("```Welcome to tonight's smoke.```")
+        time=None
+        if ctx.message.author.name in playtime_slots['Anytime']:
+            await ctx.send("```You're already in there, you addict.```")
+        else:
+            playtime_slots['Anytime'].append(ctx.message.author.name)
+            await ctx.send("```Welcome to tonight's smoke.```")
+
+    await play_channel()
 
 
 
