@@ -13,6 +13,7 @@ from playThread import updatePlayEmbed, checkTime, time_slots
 # import elo as ELO
 from time import strftime, localtime
 import time
+import copy
 os.environ['TZ'] = 'EST+05EDT,M4.1.0,M10.5.0'
 time.tzset()
 try:
@@ -55,7 +56,7 @@ async def on_ready():
     global playtime_slots, daily_reset, updatingPlayChannel, todays_date
     # updatingPlayChannel = chat_channel
     daily_reset = False
-    playtime_slots = time_slots
+    playtime_slots = copy.deepcopy(time_slots)
     todays_date = strftime("%a, %b %d", localtime())
     updatingPlayChannel = await play_thread.send(embed = updatePlayEmbed([], todays_date))
 
@@ -315,7 +316,7 @@ async def play_channel():
     global playtime_slots, daily_reset, todays_date, updatingPlayChannel
     t = int(strftime("%H", localtime()))
     if t == 5 and not daily_reset:
-        playtime_slots = time_slots
+        playtime_slots = copy.deepcopy(time_slots)
         daily_reset = True
         todays_date = strftime("%a, %b %d", localtime())
     elif t != 5 and daily_reset:
