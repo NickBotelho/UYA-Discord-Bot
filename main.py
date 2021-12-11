@@ -311,7 +311,7 @@ async def chat(chat_channel):
             message_history[message] = 1
         message_stack = []
 
-# @tasks.loop(minutes=0.25)
+@tasks.loop(minutes=30)
 async def play_channel():
     global playtime_slots, daily_reset, todays_date, updatingPlayChannel
     t = int(strftime("%H", localtime()))
