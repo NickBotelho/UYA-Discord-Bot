@@ -205,7 +205,9 @@ class Database():
             'kills/min':player['advanced_stats']['per_min']['kills/min'],
             'deaths/min':player['advanced_stats']['per_min']['deaths/min'],
             'flux_kills/min':player['advanced_stats']['per_min']['flux_kills/min'],
-            'blitz_deaths/min':player['advanced_stats']['per_min']['blitz_deaths/min']
+            'blitz_deaths/min':player['advanced_stats']['per_min']['blitz_deaths/min'],
+            'overall elo':player['advanced_stats']['elo']['overall'],
+            'CTF elo':player['advanced_stats']['elo']['CTF']
         }
         return res
     def exists(self, username):

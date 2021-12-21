@@ -17,5 +17,7 @@ AdvancedStatList = {
     'Kills Per Mininute':'kills/min',
     'Deaths Per Minute':'deaths/min',
     "Flux Kills / Minute":'flux_kills/min',
-    'Blitz Deaths / Minute' :'blitz_deaths/min'
+    'Blitz Deaths / Minute' :'blitz_deaths/min',
+    "Overall elo": "overall elo",
+    'CTF elo':"CTF elo"
 }
