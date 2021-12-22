@@ -8,12 +8,14 @@ from MapImages import MAP_IMAGES
 import os
 from GameChat import getGameChat, updateChatEmbed, updateMessages
 from StatList import BasicStatList, AdvancedStatList
-from itertools import permutations
+from itertools import combinations
 from playThread import updatePlayEmbed, checkTime, time_slots
 # import elo as ELO
 from time import strftime, localtime
 import time
 import copy
+from predictGame import predictGame
+import pickle
 os.environ['TZ'] = 'EST+05EDT,M4.1.0,M10.5.0'
 time.tzset()
 try:
@@ -45,10 +47,7 @@ api_analytics = Database("UYA","API_Analytics")
 async def on_ready():
     print("Bot is ready...")
     daemon.start()
-    # global smoke_alerted
-    # global smoke_cooldown
-    # smoke_cooldown = 0
-    # smoke_alerted = False
+
 
 
 
@@ -67,21 +66,10 @@ async def on_ready():
     message_history = {}
     chat.start(chat_channel)
 
-    # global elo
-    # elo = {}
-    # with open("elos.txt", 'r') as file:
-    #     for line in file:
-    #         line = line.split(',')
-    #         name = ''
-    #         for i in range(len(line)-1):
-    #             if i > 0:
-    #                 name = name + ','+line[i]
-    #             else:
-    #                 name+=line[i]
-                
-    #         curr_elo = int(line[-1][:len(line[-1])-1])
+    global model
+    model = pickle.load(open('uya_game_prediction(all modes).sav', 'rb'))
 
-    #         elo[name] = curr_elo
+
 
 
 
@@ -154,43 +142,33 @@ async def games(ctx):
 
     await ctx.send(embed =embed)
 
-# @client.command()
-# async def teams(ctx, idx):
-#     global elo
-#     games = games_active.getActiveGames()
-#     idx = int(idx)
-#     if idx >= len(games):
-#         #error
-#         pass
+@client.command()
+async def teams(ctx, idx):
+    global model
 
-#     game = games[idx]
-#     lobby = []
-#     for id in game['details']['players']:
-#             lobby.append(player_stats.getUsername(id))
+    games = games_active.getActiveGames()
+    idx = int(idx)
+    if idx >= len(games):
+        #error
+        await ctx.send("```Invalid Game ID```")
+    else:
+        game = games[idx]
+        if len(game['details']['players']) % 2 != 0:
+            await ctx.send("```This model is not built for uneven teams```")
+        else:
+            teams, probs = predictGame(game, model, player_stats)
+            red, red_p = teams[0], probs[0]
+            blue, blue_p = tuple(teams[1]), probs[1]
 
-#     possible_teams = permutations(lobby)
-#     best = 100
-#     best_teams = None
-#     for team in list(possible_teams):
-#         elos = ELO.getLobbyElos(elo, team)
-#         diff = abs(elos[0] - elos[1])
-#         if diff < best:
-#             best_teams = team
-#             best = diff
-    
-#     mid = len(lobby)//2
-#     red = lobby[:mid]
-#     blue = lobby[mid:]
-#     confidences = ELO.getExpected(ELO.getTeamElo(elo, red), ELO.getTeamElo(elo, blue))
 
-#     embed = discord.Embed(
-#         title = "Balanced Teams",
-#         color=11043122
-#     )
+            embed = discord.Embed(
+                title = "Balanced Teams",
+                color=11043122
+            )
 
-#     res = "Team: {}: Win Confidence {:.2f}\nTeam: {}: Win Confidence {:.2f}".format(red, confidences[0], blue, confidences[1])
-#     embed.description = res
-#     await ctx.send(embed =embed)
+            res = "Team: {}: Win Confidence {:.2f}\nTeam: {}: Win Confidence {:.2f}".format(red, red_p, blue, blue_p)
+            embed.description = res
+            await ctx.send(embed =embed)
 
 
     
