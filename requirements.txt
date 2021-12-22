@@ -4,3 +4,5 @@ async-timeout==3.0.1
 requests
 discord
 pymongo
+pandas
+numpy
