@@ -293,7 +293,9 @@ async def chat(chat_channel):
 async def play_channel():
     global playtime_slots, daily_reset, todays_date, updatingPlayChannel
     t = int(strftime("%H", localtime()))
+    print(t)
     if t == 5 and not daily_reset:
+        print("updating T...")
         playtime_slots = copy.deepcopy(time_slots)
         daily_reset = True
         todays_date = strftime("%a, %b %d", localtime())

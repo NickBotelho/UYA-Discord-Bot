@@ -164,9 +164,10 @@ class Database():
             if player['name'] not in currently_online:
                 self.deleteSmoker(player['name'])
     def getOnlinePlayers(self):
-        res = ['' for player in range(self.collection.count())]
+        # res = ['' for player in range(self.collection.count())]
+        res =[]
         for i, player in enumerate(self.collection.find()):
-            res[i] = player
+            res.append(player)
         return res
     def getActiveGames(self):
         '''return a list of mongo documents from the active games collection'''
