@@ -170,9 +170,10 @@ class Database():
         return res
     def getActiveGames(self):
         '''return a list of mongo documents from the active games collection'''
-        res = ['' for player in range(self.collection.count())]
+        # res = ['' for player in range(self.collection.count())]
+        res = []
         for i, game in enumerate(self.collection.find()):
-            res[i] = game
+            res.append(game)
         return res
     def getUsername(self, id):
         return self.collection.find_one({'account_id':id})['username']
