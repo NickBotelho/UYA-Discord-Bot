@@ -12,7 +12,7 @@ import uya_encodings
 # model_filename = 'uya_game_prediction(all modes).sav'
 # loaded_model = pickle.load(open(model_filename, 'rb'))
 
-def getTeamInformation(team):
+def getTeamInformation(team, player_stats):
     info = {
         'k/d':0,
         'w/l':0,
@@ -98,8 +98,8 @@ def predictGame(game, model, player_stats):
 
         gamemode = uya_encodings.GAMEMODES[game['details']['gamemode']]
         map = uya_encodings.MAPS[game['details']['map']]
-        red_info = getTeamInformation(red)
-        blue_info = getTeamInformation(blue)
+        red_info = getTeamInformation(red, player_stats)
+        blue_info = getTeamInformation(blue, player_stats)
 
         
         data = np.array(list(red_info.values()))
