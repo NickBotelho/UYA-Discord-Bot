@@ -6,3 +6,4 @@ discord
 pymongo
 pandas
 numpy
+sklearn
