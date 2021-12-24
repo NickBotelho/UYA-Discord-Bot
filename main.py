@@ -14,7 +14,7 @@ from playThread import updatePlayEmbed, checkTime, time_slots
 from time import strftime, localtime
 import time
 import copy
-from predictGame import predictGame
+from predictGame import predictGame, predictAll
 import pickle
 os.environ['TZ'] = 'EST+05EDT,M4.1.0,M10.5.0'
 time.tzset()
@@ -171,6 +171,30 @@ async def teams(ctx, idx):
             await ctx.send(embed =embed)
 
 
+@client.command()
+async def teamsAll(ctx, idx):
+    global model
+
+    games = games_active.getActiveGames()
+    idx = int(idx)
+    if idx >= len(games):
+        #error
+        await ctx.send("```Invalid Game ID```")
+    else:
+        game = games[idx]
+        if len(game['details']['players']) % 2 != 0:
+            await ctx.send("```This model is not built for uneven teams```")
+        else:
+            teams, probs = predictAll(game, model, player_stats)
+            embed = discord.Embed(
+                title = "Balanced Teams",
+                color=11043122
+            )
+
+
+            for team, prob in zip(teams, probs):
+                embed.add_field(name="{}".format(team), value="Win = {:.1f}%".format(prob*100))
+            await ctx.send(embed =embed)
     
     
 

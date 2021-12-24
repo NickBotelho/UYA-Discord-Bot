@@ -133,5 +133,51 @@ def predictGame(game, model, player_stats):
     total = red_p+blue_p
     return best_teams, [red_p/total, blue_p/total]
 
+def predictAll(game, model, player_stats):
+
+    lobby = []
+    for id in game['details']['players']:
+            lobby.append(player_stats.getUsername(id))
+
+    lobby = set(lobby)
+    possible_teams = combinations(lobby, len(lobby)//2)
+
+    teams, probs = [], []
+    for red in list(possible_teams):
+        blue = [name for name in lobby if name not in red]
+
+        gamemode = uya_encodings.GAMEMODES[game['details']['gamemode']]
+        map = uya_encodings.MAPS[game['details']['map']]
+        red_info = getTeamInformation(red, player_stats)
+        blue_info = getTeamInformation(blue, player_stats)
+
+        
+        data = np.array(list(red_info.values()))
+        data = data.astype(np.double)
+        red_x = data
+
+        data = np.array(list(blue_info.values()))
+        data = data.astype(np.double)
+        blue_x = data
+
+        for i, (redi, bluei) in enumerate(zip(red_x, blue_x)):
+            red_x[i], blue_x[i] = normalize(redi, bluei)
+
+        red_x = np.append(red_x, [gamemode, map])
+        blue_x = np.append(blue_x, [gamemode, map])
+
+        red_x = red_x.reshape(1, -1)
+        blue_x = blue_x.reshape(1, -1)
+        red_proba= model.predict_proba(red_x)
+        blue_proba = model.predict_proba(blue_x)
+
+
+        teams.append(red)
+        probs.append(red_proba[0,1])
+        teams.append(blue)
+        probs.append(blue_proba[0,1])
+
+    return teams, probs
+
     
 
