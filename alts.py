@@ -14,7 +14,7 @@ def getAlts(username):
         for alt in res:
             alts+=f"- {alt}\n"
     else:
-        alts = 'Player Not Found'
+        alts = "Player NOT found...It just started tracking so maybe you actually got on, you'd be in here"
 
     embed = discord.Embed(
     title = f"Accounts for: {username}",
