@@ -16,6 +16,7 @@ import time
 import copy
 from predictGame import predictGame, predictAll
 import pickle
+from alts import getAlts
 os.environ['TZ'] = 'EST+05EDT,M4.1.0,M10.5.0'
 time.tzset()
 try:
@@ -89,7 +90,10 @@ async def online(ctx):
     field = ""
     num_players_online = len(players)
     for player in players:
-        field+='({})\t {}\n'.format(player['status'], player['username'])
+        if player['clan_tag'] != '':
+            field+='({})\t {} [{}]\n'.format(player['status'], player['username'], player['clan_tag'])
+        else:
+            field+='({})\t {}\n'.format(player['status'], player['username'])
     field = "None" if len(field) == 0 else field
     if field != "None":
         field+="\n[Total Players: {}]\n".format(num_players_online)
@@ -246,6 +250,10 @@ async def advancedStats(ctx, username):
     else:
         embed.description = "Player not found. Make sure to add quotes if name is two words i.e \"Pooper Scooper\". Or you may have to log in to sync your acocunt."
     await ctx.send(embed =embed)
+
+@client.command()
+async def alt(ctx, username):
+    await ctx.send(embed = getAlts(username))
 
 # import requests
 # @client.command()
