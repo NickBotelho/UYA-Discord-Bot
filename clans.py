@@ -2,7 +2,7 @@ import discord
 def getClanEmbed(clan):
     embed = discord.Embed(
     title = f"{clan['clan_name']}",
-    description = f"Tag [{clan['clan_tag']}]",
+    description = f"[ {clan['clan_tag']} ]",
     color=11043122
     )
 
