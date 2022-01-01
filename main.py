@@ -17,6 +17,7 @@ import copy
 from predictGame import predictGame, predictAll
 import pickle
 from alts import getAlts
+from clans import getClanEmbed
 os.environ['TZ'] = 'EST+05EDT,M4.1.0,M10.5.0'
 time.tzset()
 try:
@@ -42,6 +43,7 @@ players_online = Database("UYA","Players_Online")
 game_history = Database("UYA", "Game_History")
 games_active = Database("UYA","Games_Active")
 api_analytics = Database("UYA","API_Analytics")
+clans = Database("UYA", "Clans")
 
 
 @client.event
@@ -359,6 +361,17 @@ async def play(ctx):
             await ctx.send("```Welcome to tonight's smoke.```")
 
     await play_channel()
+
+@client.command()
+async def clan(ctx, clan_name):
+    clan_name = clan_name.lower()
+    clan = clans.collection.find_one({'clan_name_lower':clan_name})
+    if not clan:
+        await ctx.send("```Clan Not Found```")
+    else:
+        await ctx.send(embed = getClanEmbed(clan))
+
+        
 
 
 
