@@ -210,19 +210,20 @@ async def basicStats(ctx, username):
     global basicStatCalls
     basicStatCalls+=1
     embed = discord.Embed(
-        title = "Basic Stats",
+        title = f"{username} Basic Stats",
         # url = "https://socomcommunity.com/servers/10684", 
         # description = "Players Online",
         color=11043122
     )
     if player_stats.exists(username):
         realName = player_stats.getRealName(username)
-        info = player_stats.getPlayerBasicStats(username)
+        info, clan = player_stats.getPlayerBasicStats(username)
         res = ""
         for stat in BasicStatList:
             field = "{}: {}\n".format(stat, info[BasicStatList[stat]])
             res+=field
-        embed.add_field(name = '{} Stats'.format(realName), value = res)
+        embed.add_field(name='Clan', value = clan, inline = False)
+        embed.add_field(name = 'Stats', value = res, inline=False)
         embed.set_thumbnail(url='https://static.wikia.nocookie.net/logopedia/images/c/cb/Ratchet_%26_Clank_-_Up_Your_Arsenal.png/revision/latest?cb=20140112222339')
         
     else:

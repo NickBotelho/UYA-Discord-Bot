@@ -182,7 +182,8 @@ class Database():
         username=username.lower().strip()
         player = self.collection.find_one({'username_lowercase':username})
         res = player['stats']['overall']
-        return res
+        clan = player['clan_name']
+        return res, clan
     def getPlayerAdvancedStats(self, username):
         username=username.lower().strip()
         player = self.collection.find_one({'username_lowercase':username})
