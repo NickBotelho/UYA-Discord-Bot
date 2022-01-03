@@ -378,7 +378,7 @@ async def clan(ctx, clan_name):
     else:
         await ctx.send(embed = getClanEmbed(clan))
 
-@tasks.loop(minutes=1)
+@tasks.loop(minutes=120)
 async def checkRoles():
     caps = player_stats.getTop5('stats.ctf.ctf_caps')
     saves = player_stats.getTop5('stats.ctf.ctf_saves')
@@ -418,13 +418,16 @@ async def assign(ctx, uya_name):
             with open('discord_ids.json') as file:
                 users = json.load(file)
 
-        users[uya_name] = id
-        print(users)
+        if uya_name not in users:
+            users[uya_name] = id
+            print(users)
 
-        with open("discord_ids.json", 'w') as file:
-            json.dump(users, file)
-        await ctx.send("```{uya_name} added```")
-        
+            with open("discord_ids.json", 'w') as file:
+                json.dump(users, file)
+            await ctx.send(f"```{uya_name} added```")
+        else:
+            await ctx.send("```Name already in here```")
+
     else:
         await ctx.send("```Player Not Found```")
 
