@@ -277,7 +277,7 @@ class Database():
         return res
     def addID(self, name, id, player_stats):
         player = player_stats.collection.find_one({'username_lowercase':name.lower()})
-        self.collection.insert(
+        self.collection.insert_one(
                 {
                     "username":player['username'],
                     'discord_id': id,
