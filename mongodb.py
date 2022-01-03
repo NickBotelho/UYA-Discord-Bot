@@ -261,6 +261,15 @@ class Database():
                     }
                 }
             )
+    def getTop5(self, stat):
+        res = []
+        i = 0
+        for player in self.collection.find().sort([(stat,-1)]):
+            if i < 5:
+                i+=1
+                res.append(player['username'])
+            else: break
+        return res
 
         
 

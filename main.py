@@ -18,6 +18,9 @@ from predictGame import predictGame, predictAll
 import pickle
 from alts import getAlts
 from clans import getClanEmbed
+import json
+from discord.utils import get
+
 os.environ['TZ'] = 'EST+05EDT,M4.1.0,M10.5.0'
 time.tzset()
 try:
@@ -33,7 +36,10 @@ try:
 except:
     print('failed to load bot token credentials')
     exit(1)
-client = commands.Bot(command_prefix = "!")
+
+intents = discord.Intents.default()
+intents.members = True
+client = commands.Bot(command_prefix = "!", intents = intents)
 
 onlineCalls, gameCalls, basicStatCalls, advancedStatCalls = 0, 0, 0, 0
 
@@ -50,8 +56,6 @@ clans = Database("UYA", "Clans")
 async def on_ready():
     print("Bot is ready...")
     daemon.start()
-
-
 
 
     play_thread = client.get_channel(TODAYS_PLAYERS)
@@ -71,6 +75,8 @@ async def on_ready():
 
     global model
     model = pickle.load(open('uya_game_prediction(all modes).sav', 'rb'))
+
+    await checkRoles.start()
 
 
 
@@ -371,6 +377,62 @@ async def clan(ctx, clan_name):
         await ctx.send("```Clan Not Found```")
     else:
         await ctx.send(embed = getClanEmbed(clan))
+
+@tasks.loop(minutes=1)
+async def checkRoles():
+    caps = player_stats.getTop5('stats.ctf.ctf_caps')
+    saves = player_stats.getTop5('stats.ctf.ctf_saves')
+    baseDmg = player_stats.getTop5('stats.overall.overall_base_dmg')
+    kills = player_stats.getTop5('stats.overall.kills')
+    wins = player_stats.getTop5('stats.overall.wins')
+    nodes = player_stats.getTop5('stats.overall.nodes')
+
+    specialRoles = {
+        'Elite Rusher':caps,
+        'Elite Defender':saves,
+        'Elite Killer':kills,
+        'Elite Winner':wins,
+        'Elite Node Technician': nodes,
+        'Elite Base Destroyer': baseDmg,
+    }
+
+    users = {} if not os.path.exists("discord_ids.json") else json.load(open('discord_ids.json'))
+    aquatos = get(client.guilds, id = 357568581178884107)
+    for username in users:
+        member = get(aquatos.members, id = users[username])
+        for role in specialRoles:
+            if username in specialRoles[role]:
+                role = get(aquatos.roles, name = role)
+                await member.add_roles(role)
+            else:
+                role = get(aquatos.roles, name = role)
+                if role in member.roles:
+                    await member.remove_roles(role)
+                
+@client.command()
+async def assign(ctx, uya_name):
+    if player_stats.exists(uya_name):
+        id = ctx.author.id
+        users = {}
+        if os.path.exists("discord_ids.json"):
+            with open('discord_ids.json') as file:
+                users = json.load(file)
+
+        users[uya_name] = id
+        print(users)
+
+        with open("discord_ids.json", 'w') as file:
+            json.dump(users, file)
+        await ctx.send("```{uya_name} added```")
+        
+    else:
+        await ctx.send("```Player Not Found```")
+
+    
+    
+    
+
+
 
         
 
