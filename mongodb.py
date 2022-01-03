@@ -270,6 +270,20 @@ class Database():
                 res.append(player['username'])
             else: break
         return res
+    def getAll(self):
+        res = {}
+        for player in self.collection.find():
+            res[player['username']] = player['discord_id']
+        return res
+    def addID(self, name, id, player_stats):
+        player = player_stats.collection.find_one({'username_lowercase':name.lower()})
+        self.collection.insert(
+                {
+                    "username":player['username'],
+                    'discord_id': id,
+                    "username_lowercase":name.lower(),
+                }
+            )
 
         
 

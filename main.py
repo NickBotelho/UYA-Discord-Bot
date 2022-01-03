@@ -11,7 +11,7 @@ from StatList import BasicStatList, AdvancedStatList
 from itertools import combinations
 from playThread import updatePlayEmbed, checkTime, time_slots
 # import elo as ELO
-from time import strftime, localtime
+from time import strftime, localtime, gmtime
 import time
 import copy
 from predictGame import predictGame, predictAll
@@ -50,6 +50,7 @@ game_history = Database("UYA", "Game_History")
 games_active = Database("UYA","Games_Active")
 api_analytics = Database("UYA","API_Analytics")
 clans = Database("UYA", "Clans")
+discord_ids = Database("UYA", "Discord_IDs")
 
 
 @client.event
@@ -65,6 +66,7 @@ async def on_ready():
     playtime_slots = copy.deepcopy(time_slots)
     todays_date = strftime("%a, %b %d", localtime())
     updatingPlayChannel = await play_thread.send(embed = updatePlayEmbed([], todays_date))
+    play_channel.start()
 
     chat_channel = client.get_channel(CHAT_CHANNEL)
     global message_stack
@@ -330,17 +332,16 @@ async def chat(chat_channel):
             message_history[message] = 1
         message_stack = []
 
-@tasks.loop(minutes=30)
+@tasks.loop(minutes=60)
 async def play_channel():
     global playtime_slots, daily_reset, todays_date, updatingPlayChannel
-    t = int(strftime("%H", localtime()))
-    print(t)
-    if t == 5 and not daily_reset:
+    t = int(strftime("%H", gmtime()))
+    if t == 10 and not daily_reset:
         print("updating T...")
         playtime_slots = copy.deepcopy(time_slots)
         daily_reset = True
         todays_date = strftime("%a, %b %d", localtime())
-    elif t != 5 and daily_reset:
+    elif t != 10 and daily_reset:
         daily_reset = False
     await updatingPlayChannel.edit(embed = updatePlayEmbed(playtime_slots, todays_date))
     
@@ -386,17 +387,21 @@ async def checkRoles():
     kills = player_stats.getTop5('stats.overall.kills')
     wins = player_stats.getTop5('stats.overall.wins')
     nodes = player_stats.getTop5('stats.overall.nodes')
+    squats = player_stats.getTop5('stats.other.squats')
+    suicides = player_stats.getTop5('stats.overall.suicides')
 
     specialRoles = {
-        'Elite Rusher':caps,
-        'Elite Defender':saves,
-        'Elite Killer':kills,
-        'Elite Winner':wins,
-        'Elite Node Technician': nodes,
-        'Elite Base Destroyer': baseDmg,
+        'Top 5 Rusher':caps,
+        'Top 5 Defender':saves,
+        'Top 5 Killer':kills,
+        'Top 5 Winner':wins,
+        'Top 5 Node Technician': nodes,
+        'Top 5 Base Destroyer': baseDmg,
+        'Top 5 Swimmer' :suicides,
+        'Top 5 T-Bagger' : squats
     }
 
-    users = {} if not os.path.exists("discord_ids.json") else json.load(open('discord_ids.json'))
+    users = discord_ids.getAll()
     aquatos = get(client.guilds, id = 357568581178884107)
     for username in users:
         member = get(aquatos.members, id = users[username])
@@ -413,17 +418,9 @@ async def checkRoles():
 async def assign(ctx, uya_name):
     if player_stats.exists(uya_name):
         id = ctx.author.id
-        users = {}
-        if os.path.exists("discord_ids.json"):
-            with open('discord_ids.json') as file:
-                users = json.load(file)
 
-        if uya_name not in users:
-            users[uya_name] = id
-            print(users)
-
-            with open("discord_ids.json", 'w') as file:
-                json.dump(users, file)
+        if not discord_ids.exists(uya_name):
+            discord_ids.addID(uya_name, id, player_stats)            
             await ctx.send(f"```{uya_name} added```")
         else:
             await ctx.send("```Name already in here```")
