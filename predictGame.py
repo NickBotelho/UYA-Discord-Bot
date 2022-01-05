@@ -85,8 +85,8 @@ def normalize(winner, loser):
 def predictGame(game, model, player_stats):
 
     lobby = []
-    for id in game['details']['players']:
-            lobby.append(player_stats.getUsername(id))
+    for name in game['details']['players']:
+            lobby.append(name)
 
     lobby = set(lobby)
     possible_teams = combinations(lobby, len(lobby)//2)
@@ -136,8 +136,8 @@ def predictGame(game, model, player_stats):
 def predictAll(game, model, player_stats):
 
     lobby = []
-    for id in game['details']['players']:
-            lobby.append(player_stats.getUsername(id))
+    for name in game['details']['players']:
+            lobby.append(name)
 
     lobby = set(lobby)
     possible_teams = combinations(lobby, len(lobby)//2)
