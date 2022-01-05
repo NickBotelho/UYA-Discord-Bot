@@ -371,10 +371,10 @@ async def play(ctx):
                 await ctx.send("```Welcome to tonight's smoke.```")
     else:
         time=None
-        if ctx.message.author.name in playtime_slots['Anytime']:
+        if smoke_schedule.scheduleContains(ctx.message.author.name, 'Anytime'):
             await ctx.send("```You're already in there, you addict.```")
         else:
-            playtime_slots['Anytime'].append(ctx.message.author.name)
+            smoke_schedule.addToTime('Anytime', ctx.message.author.name)
             await ctx.send("```Welcome to tonight's smoke.```")
 
     await play_channel()
