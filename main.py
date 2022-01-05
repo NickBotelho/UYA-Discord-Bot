@@ -417,6 +417,7 @@ async def checkRoles():
         for role in specialRoles:
             if username in specialRoles[role]:
                 role = get(aquatos.roles, name = role)
+                if role in member.roles: continue
                 await member.add_roles(role)
             else:
                 role = get(aquatos.roles, name = role)
