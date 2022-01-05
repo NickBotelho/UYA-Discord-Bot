@@ -14,7 +14,7 @@ AdvancedStatList = {
     'Flags Saved':'saves',
     'Flux Usage %':'flux_usage',
     'Flux/Blitz Ratio':'flux/blitz',
-    'Kills Per Mininute':'kills/min',
+    'Kills Per Minute':'kills/min',
     'Deaths Per Minute':'deaths/min',
     "Flux Kills / Minute":'flux_kills/min',
     'Blitz Deaths / Minute' :'blitz_deaths/min',
