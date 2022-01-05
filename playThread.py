@@ -73,7 +73,7 @@ def updateOnlineThreadEmbed(players_online, player_stats, games_active,clans):
     field = '```None```' if len(games) == 0 else ''
     for game in games:
         host = player_stats.getUsername(game['details']['host']) + "'s"
-        status = game['details']['status']
+        status = game['details']['status'].replace("_", " ")
         arena = game['details']['map'].replace("_", " ")
         mode = game['details']['gamemode']
         weapons = ""
