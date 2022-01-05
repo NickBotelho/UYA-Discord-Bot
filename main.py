@@ -438,7 +438,7 @@ async def assign(ctx, uya_name):
         await ctx.send("```Player Not Found```")
 
     
-@tasks.loop(minutes = 0.1)
+@tasks.loop(minutes = 0.5)
 async def updateOnlineThread():
     global updatingOnlineMessage
 
