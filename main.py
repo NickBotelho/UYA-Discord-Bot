@@ -3,13 +3,13 @@ from discord import player
 import discord
 from discord.ext import commands, tasks
 from mongodb import Database
-from config import BOT_TOKEN, CHAT_CHANNEL, TODAYS_PLAYERS
+from config import BOT_TOKEN, CHAT_CHANNEL, ONLINE_CHANNEL, TODAYS_PLAYERS
 from MapImages import MAP_IMAGES
 import os
 from GameChat import getGameChat, updateChatEmbed, updateMessages
 from StatList import BasicStatList, AdvancedStatList
 from itertools import combinations
-from playThread import updatePlayEmbed, checkTime, time_slots
+from playThread import updatePlayEmbed, checkTime, time_slots, updateOnlineThreadEmbed
 # import elo as ELO
 from time import strftime, localtime, gmtime
 import time
@@ -33,6 +33,9 @@ try:
     if not TODAYS_PLAYERS:
         TODAYS_PLAYERS = os.environ['TODAYS_PLAYERS']
         TODAYS_PLAYERS = int(TODAYS_PLAYERS)
+    if not ONLINE_CHANNEL:
+        ONLINE_CHANNEL = os.environ['ONLINE_CHANNEL']
+        ONLINE_CHANNEL = int(ONLINE_CHANNEL)
 except:
     print('failed to load bot token credentials')
     exit(1)
@@ -51,6 +54,7 @@ games_active = Database("UYA","Games_Active")
 api_analytics = Database("UYA","API_Analytics")
 clans = Database("UYA", "Clans")
 discord_ids = Database("UYA", "Discord_IDs")
+smoke_schedule = Database("UYA","Smoke_Schedule")
 
 
 @client.event
@@ -60,12 +64,12 @@ async def on_ready():
 
 
     play_thread = client.get_channel(TODAYS_PLAYERS)
-    global playtime_slots, daily_reset, updatingPlayChannel, todays_date
+    await play_thread.purge(limit = 5)
+    global daily_reset, updatingPlayChannel, todays_date
     # updatingPlayChannel = chat_channel
     daily_reset = False
-    playtime_slots = copy.deepcopy(time_slots)
     todays_date = strftime("%a, %b %d", localtime())
-    updatingPlayChannel = await play_thread.send(embed = updatePlayEmbed([], todays_date))
+    updatingPlayChannel = await play_thread.send(embed = updatePlayEmbed(todays_date, smoke_schedule))
     play_channel.start()
 
     chat_channel = client.get_channel(CHAT_CHANNEL)
@@ -77,6 +81,12 @@ async def on_ready():
 
     global model
     model = pickle.load(open('uya_game_prediction(all modes).sav', 'rb'))
+
+    global updatingOnlineMessage
+    onlineThread = client.get_channel(ONLINE_CHANNEL)
+    await onlineThread.purge(limit = 5)
+    updatingOnlineMessage = await onlineThread.send(embed = updateOnlineThreadEmbed(players_online, player_stats, games_active, clans))
+    updateOnlineThread.start()
 
     await checkRoles.start()
 
@@ -137,14 +147,14 @@ async def games(ctx):
 
         lobby = ""
         for id in game['details']['players']:
-            lobby += player_stats.getUsername(id) + "\t"
+            lobby += player_stats.getUsername(id) + ",\t"
 
         value = """
-        Status: {}
-        Map: {}
-        Gamemode: {}
-        Weapons: {}
-        Players: {}
+Status: {}
+Map: {}
+Gamemode: {}
+Weapons: {}
+Players: {}
 
         """.format(status, arena, mode, weapons, lobby)
         embed.add_field(name =host, value = value, inline='False')
@@ -334,20 +344,19 @@ async def chat(chat_channel):
 
 @tasks.loop(minutes=60)
 async def play_channel():
-    global playtime_slots, daily_reset, todays_date, updatingPlayChannel
-    t = int(strftime("%H", gmtime()))
+    global daily_reset, todays_date, updatingPlayChannel
+    t = int(strftime("%H", gmtime())) #gmtime = ET + 5
     if t == 10 and not daily_reset:
         print("updating T...")
-        playtime_slots = copy.deepcopy(time_slots)
-        daily_reset = True
         todays_date = strftime("%a, %b %d", localtime())
+        smoke_schedule.resetSmokeSchedule(todays_date)
+        daily_reset = True
     elif t != 10 and daily_reset:
         daily_reset = False
-    await updatingPlayChannel.edit(embed = updatePlayEmbed(playtime_slots, todays_date))
+    await updatingPlayChannel.edit(embed = updatePlayEmbed(todays_date, smoke_schedule))
     
 @client.command()
 async def play(ctx):
-    global playtime_slots
     arg = ctx.message.content.split(" ")
     if len(arg) > 1:
         time = arg[1].lower()
@@ -355,10 +364,10 @@ async def play(ctx):
         if not checkTime(time):
             await ctx.send("```Not a valid time.```")
         else:
-            if ctx.message.author.name in playtime_slots[time]:
+            if smoke_schedule.scheduleContains(ctx.message.author.name, time):
                 await ctx.send("```You're already in there, you addict.```")
             else:
-                playtime_slots[time].append(ctx.message.author.name)
+                smoke_schedule.addToTime(time, ctx.message.author.name)
                 await ctx.send("```Welcome to tonight's smoke.```")
     else:
         time=None
@@ -429,7 +438,11 @@ async def assign(ctx, uya_name):
         await ctx.send("```Player Not Found```")
 
     
-    
+@tasks.loop(minutes = 0.1)
+async def updateOnlineThread():
+    global updatingOnlineMessage
+
+    await updatingOnlineMessage.edit(embed = updateOnlineThreadEmbed(players_online, player_stats, games_active, clans))
     
 
 

@@ -3,6 +3,8 @@ from pymongo import MongoClient
 import time
 from config import MongoPW, MongoUser
 import os
+import playThread
+import copy
 try:
     if not MongoPW or not MongoUser:
         print('trying to get environment vars')
@@ -284,6 +286,46 @@ class Database():
                     "username_lowercase":name.lower(),
                 }
             )
+    def getOnlineClans(self, players_online):
+        '''players_online is list of the mongo documents for the online players'''
+        res = "```\n"
+        i=0
+        for player in players_online:
+            clanName = player['clan_name']
+            clan = self.collection.find_one({'clan_name':clanName})
+            player_name = player['username']
+            if clan != None and clan['leader_account_name'] == player_name:
+                res+=f"{clan['clan_name']}  [{clan['clan_tag']}]\n"
+                i+=1
+        res+='```'
+        return res, i
+    def resetSmokeSchedule(self, date):
+        emptySchedule = copy.deepcopy(playThread.time_slots)
+        self.collection.find_one_and_delete({'name': 'Smoke Schedule'})
+        self.collection.insert_one({
+            'name':'Smoke Schedule',
+            'date':date,
+            'schedule':emptySchedule
+        })
+    def addToTime(self, time, player):
+        schedule = self.collection.find_one({"name":'Smoke Schedule'})['schedule']
+        currentPlayers = schedule[time]
+        currentPlayers.append(player)
+        self.collection.find_one_and_update(
+                {
+                    'name': 'Smoke Schedule'
+                },
+                {
+                    "$set":{
+                        f"schedule.{time}":currentPlayers
+                    }
+                }
+            )
+    def scheduleContains(self, player, time):
+        schedule = self.collection.find_one({'name':"Smoke Schedule"})['schedule']
+        return player in schedule[time]
+
+
 
         
 

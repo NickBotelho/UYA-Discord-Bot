@@ -1,12 +1,13 @@
 import discord
 
 
-def updatePlayEmbed(playtime_slots, time):
+def updatePlayEmbed(time, smoke_schedule):
     chat_embed = discord.Embed(
         title = 'Players Who Want To Play (ET Times)',
         color=11043122
     )
 
+    playtime_slots = smoke_schedule.collection.find_one({'name':"Smoke Schedule"})['schedule']
     for playtime in playtime_slots:
         if len(playtime_slots[playtime]) > 0:
             field = ''
@@ -34,7 +35,7 @@ time_slots = {
     '9am':[],
     '10am':[],
     '11am':[],
-    '12am':[],
+    '12pm':[],
     '1pm':[],
     '2pm':[],
     '3pm':[],
@@ -46,6 +47,54 @@ time_slots = {
     '9pm':[],
     '10pm':[],
     '11pm':[],
-    '12pm':[],
+    '12am':[],
     "Anytime":[]    
 }
+
+def updateOnlineThreadEmbed(players_online, player_stats, games_active,clans):
+    embed = discord.Embed(
+        title = "Aquatos",
+        # url = "https://socomcommunity.com/servers/10684", 
+        # description = "Players Online",
+        color=11043122
+    )
+    #Online Players
+    players = players_online.getOnlinePlayers()
+    field = '```None' if len(players) == 0 else '```'
+    for player in players:
+        field+=f"{player['username']    [{player['clan_tag']}]}\n"
+    embed.add_field(name = f'Players Online [{len(players)}]', value = field+"```", inline = False)
+    #Games
+    games = games_active.getActiveGames()
+    field = '```None```' if len(games) == 0 else ''
+    for game in games:
+        host = player_stats.getUsername(game['details']['host']) + "'s"
+        status = game['details']['status']
+        arena = game['details']['map'].replace("_", " ")
+        mode = game['details']['gamemode']
+        weapons = ""
+        for gun in game['details']['weapons']:
+            weapons+=gun+", "
+        
+        weapons = "Wrench Only" if weapons == "" else weapons[:len(weapons)-2]
+
+        lobby = ""
+        for id in game['details']['players']:
+            lobby += player_stats.getUsername(id) + ", "
+
+        value = """```
+Host: {}
+Status: {}
+Map: {}
+Gamemode: {}
+Weapons: {}
+Players: {}```\n""".format(host, status, arena, mode, weapons, lobby)
+        field+=value
+    embed.add_field(name = f"Active Games [{len(games)}]", value = field, inline = False)
+
+    #clans
+    clanList, numsClans = clans.getOnlineClans(players)
+    if numsClans == 0: clanList = "```None```"
+    embed.add_field(name=f'Clans Online [{numsClans}]', value = clanList)
+
+    return embed
