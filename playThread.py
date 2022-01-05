@@ -62,7 +62,7 @@ def updateOnlineThreadEmbed(players_online, player_stats, games_active,clans):
     players = players_online.getOnlinePlayers()
     field = '```None' if len(players) == 0 else '```'
     for player in players:
-        field+=f"{player['username']    [{player['clan_tag']}]}\n"
+        field+=f"{player['username']}    [{player['clan_tag']}]\n"
     embed.add_field(name = f'Players Online [{len(players)}]', value = field+"```", inline = False)
     #Games
     games = games_active.getActiveGames()
