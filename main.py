@@ -135,7 +135,7 @@ async def games(ctx):
 
     games_added = 0
     for game in games:
-        host = player_stats.getUsername(game['details']['host']) + "'s"
+        host = game['details']['host'] + "'s"
         status = game['details']['status']
         arena = game['details']['map']
         mode = game['details']['gamemode']
@@ -146,8 +146,8 @@ async def games(ctx):
         weapons = "Wrench Only" if weapons == "" else weapons[:len(weapons)-2]
 
         lobby = ""
-        for id in game['details']['players']:
-            lobby += player_stats.getUsername(id) + ",\t"
+        for name in game['details']['players']:
+            lobby += name + ",\t"
 
         value = """
 Status: {}

@@ -72,7 +72,7 @@ def updateOnlineThreadEmbed(players_online, player_stats, games_active,clans):
     games = games_active.getActiveGames()
     field = '```None```' if len(games) == 0 else ''
     for game in games:
-        host = player_stats.getUsername(game['details']['host']) + "'s"
+        host = player_stats.getUsername(game['details']['host'])
         status = game['details']['status'].replace("_", " ")
         arena = game['details']['map'].replace("_", " ")
         mode = game['details']['gamemode']
@@ -83,8 +83,8 @@ def updateOnlineThreadEmbed(players_online, player_stats, games_active,clans):
         weapons = "Wrench Only" if weapons == "" else weapons[:len(weapons)-2]
 
         lobby = ""
-        for id in game['details']['players']:
-            lobby += player_stats.getUsername(id) + ", "
+        for name in game['details']['players']:
+            lobby += name + ", "
 
         value = """```
 Host: {}
