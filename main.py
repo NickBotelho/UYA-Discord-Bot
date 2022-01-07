@@ -240,6 +240,7 @@ async def basicStats(ctx, username):
     if player_stats.exists(username):
         realName = player_stats.getRealName(username)
         info, clan = player_stats.getPlayerBasicStats(username)
+        clan = "None" if clan == '' else clan
         res = ""
         for stat in BasicStatList:
             field = "{}: {}\n".format(stat, info[BasicStatList[stat]])
