@@ -211,13 +211,17 @@ async def teamsAll(ctx, idx):
         else:
             teams, probs = predictAll(game, model, player_stats)
             embed = discord.Embed(
-                title = "Balanced Teams",
+                title = "Every Team Combination",
                 color=11043122
             )
+            sort = {team:prob for team, prob in zip(teams, probs)}
+            sort = sorted(sort.items(), key = lambda x : x[1], reverse=True)
+            field = ''
 
-
-            for team, prob in zip(teams, probs):
-                embed.add_field(name="{}".format(team), value="Win = {:.1f}%".format(prob*100))
+            for sample in sort:
+                field+= "{} --> {:.2f}%\n".format(sample[0], sample[1])
+                
+            embed.add_field(name="Win Probabilities", value=field)
             await ctx.send(embed =embed)
     
     

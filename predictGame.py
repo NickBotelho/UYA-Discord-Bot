@@ -174,10 +174,11 @@ def predictAll(game, model, player_stats):
 
         teams.append(red)
         probs.append(red_proba[0,1])
-        teams.append(blue)
-        probs.append(blue_proba[0,1])
 
     return teams, probs
+
+        
+
 
     
 
