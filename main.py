@@ -217,11 +217,14 @@ async def teamsAll(ctx, idx):
             sort = {team:prob for team, prob in zip(teams, probs)}
             sort = sorted(sort.items(), key = lambda x : x[1], reverse=True)
             field = ''
-
+            part = 1
             for sample in sort:
-                field+= "{} --> {:.2f}%\n".format(sample[0], sample[1])
-                
-            embed.add_field(name="Win Probabilities", value=field)
+                field+= "{} --> {:.1f}%\n".format(sample[0], sample[1]*100)
+                if len(field) > 900:
+                    embed.add_field(name=f"Win Probabilities Part {part}", value=field, inline=False)
+                    part+=1
+                    field = ''
+            embed.add_field(name=f"Win Probabilities Part {part}", value=field, inline=False)
             await ctx.send(embed =embed)
     
     
