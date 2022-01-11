@@ -2,6 +2,7 @@ from logging import error
 from discord import player
 import discord
 from discord.ext import commands, tasks
+from graphs import produceGraphs
 from mongodb import Database
 from config import BOT_TOKEN, CHAT_CHANNEL, ONLINE_CHANNEL, TODAYS_PLAYERS
 from MapImages import MAP_IMAGES
@@ -63,6 +64,7 @@ async def on_ready():
     daemon.start()
 
 
+
     play_thread = client.get_channel(TODAYS_PLAYERS)
     await play_thread.purge(limit = 5)
     global daily_reset, updatingPlayChannel, todays_date
@@ -88,13 +90,21 @@ async def on_ready():
     updatingOnlineMessage = await onlineThread.send(embed = updateOnlineThreadEmbed(players_online, player_stats, games_active, clans))
     updateOnlineThread.start()
 
+
+    #Graphs
+    if not os.path.exists("graphs"):
+        os.mkdir('graphs')
+
+    global graphs
+    graphs = set()
+
     await checkRoles.start()
 
 
 
 
 
-@client.command()
+@client.command(brief = 'show online players')
 async def online(ctx):
     global onlineCalls
     onlineCalls+=1
@@ -122,7 +132,7 @@ async def online(ctx):
     embed.set_thumbnail(url='https://static.wikia.nocookie.net/logopedia/images/c/cb/Ratchet_%26_Clank_-_Up_Your_Arsenal.png/revision/latest?cb=20140112222339')
     await ctx.send(embed = embed)
 
-@client.command()
+@client.command(brief = 'show active games')
 async def games(ctx):
     global gameCalls
     gameCalls+=1
@@ -166,7 +176,7 @@ Players: {}
 
     await ctx.send(embed =embed)
 
-@client.command()
+@client.command(brief = "<0-indexed index of the active game>")
 async def teams(ctx, idx):
     global model
 
@@ -195,7 +205,7 @@ async def teams(ctx, idx):
             await ctx.send(embed =embed)
 
 
-@client.command()
+@client.command(brief = "<0-indexed index of the active game>")
 async def teamsAll(ctx, idx):
     global model
 
@@ -230,7 +240,7 @@ async def teamsAll(ctx, idx):
     
 
 
-@client.command()
+@client.command(brief = "<uya username>")
 async def basicStats(ctx, username):
     global basicStatCalls
     basicStatCalls+=1
@@ -256,7 +266,7 @@ async def basicStats(ctx, username):
         embed.description = "Player not found. Make sure to and add quotes if name is two words i.e \"Pooper Scooper\". Or you may have to log in to sync your acocunt."
     await ctx.send(embed =embed)
 
-@client.command()
+@client.command(brief = "<uya username>")
 async def advancedStats(ctx, username):
     global advancedStatCalls
     advancedStatCalls+=1
@@ -280,7 +290,7 @@ async def advancedStats(ctx, username):
         embed.description = "Player not found. Make sure to add quotes if name is two words i.e \"Pooper Scooper\". Or you may have to log in to sync your acocunt."
     await ctx.send(embed =embed)
 
-@client.command()
+@client.command(brief = "<uya username>")
 async def alt(ctx, username):
     await ctx.send(embed = getAlts(username))
 
@@ -363,7 +373,7 @@ async def play_channel():
         daily_reset = False
     await updatingPlayChannel.edit(embed = updatePlayEmbed(todays_date, smoke_schedule))
     
-@client.command()
+@client.command(brief = '<time in ET>')
 async def play(ctx):
     arg = ctx.message.content.split(" ")
     if len(arg) > 1:
@@ -387,7 +397,7 @@ async def play(ctx):
 
     await play_channel()
 
-@client.command()
+@client.command(brief = "<name of clan>")
 async def clan(ctx, clan_name):
     clan_name = clan_name.lower()
     clan = clans.collection.find_one({'clan_name_lower':clan_name})
@@ -432,7 +442,7 @@ async def checkRoles():
                 if role in member.roles:
                     await member.remove_roles(role)
                 
-@client.command()
+@client.command(brief = "<uya in game>")
 async def assign(ctx, uya_name):
     if player_stats.exists(uya_name):
         id = ctx.author.id
@@ -450,12 +460,56 @@ async def assign(ctx, uya_name):
 @tasks.loop(minutes = 0.5)
 async def updateOnlineThread():
     global updatingOnlineMessage
-
     await updatingOnlineMessage.edit(embed = updateOnlineThreadEmbed(players_online, player_stats, games_active, clans))
     
 
+@client.command(brief = "<game size> for example <2v2>")
+async def weekdays(ctx, size):
+    global graphs
 
+    if 'weekdays{}'.format(size) not in graphs:   
+        if size == '1v1':
+            graphs.add('weekdays{}'.format(size))
+            graphs.add('months{}'.format(size))
+            produceGraphs()
+        elif size == '2v2':
+            graphs.add('weekdays{}'.format(size))
+            graphs.add('months{}'.format(size))
+            produceGraphs(4)
+        elif size == '3v3':
+            graphs.add('weekdays{}'.format(size))
+            graphs.add('months{}'.format(size))
+            produceGraphs(6)
+        elif size == '4v4':
+            graphs.add('weekdays{}'.format(size))
+            graphs.add('months{}'.format(size))
+            produceGraphs(8)
 
+    await ctx.send(file = discord.File('graphs/weekdays{}+.png'.format(size)))
+
+@client.command(brief = "<game size> for example <2v2>")
+async def months(ctx, size):
+    global graphs
+
+    if 'months{}'.format(size) not in graphs:   
+        if size == '1v1':
+            graphs.add('weekdays{}'.format(size))
+            graphs.add('months{}'.format(size))
+            produceGraphs()
+        elif size == '2v2':
+            graphs.add('weekdays{}'.format(size))
+            graphs.add('months{}'.format(size))
+            produceGraphs(4)
+        elif size == '3v3':
+            graphs.add('weekdays{}'.format(size))
+            graphs.add('months{}'.format(size))
+            produceGraphs(6)
+        elif size == '4v4':
+            graphs.add('weekdays{}'.format(size))
+            graphs.add('months{}'.format(size))
+            produceGraphs(8)
+
+    await ctx.send(file = discord.File('graphs/months{}+.png'.format(size)))
         
 
 

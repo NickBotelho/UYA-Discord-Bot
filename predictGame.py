@@ -178,7 +178,3 @@ def predictAll(game, model, player_stats):
     return teams, probs
 
         
-
-
-    
-
