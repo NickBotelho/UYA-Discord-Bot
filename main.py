@@ -15,7 +15,7 @@ from playThread import updatePlayEmbed, checkTime, time_slots, updateOnlineThrea
 from time import strftime, localtime, gmtime
 import time
 import copy
-from predictGame import predictGame, predictAll
+from predictGame import predictGame, predictAll, getTeamInformation, getInfoSummary
 import pickle
 from alts import getAlts
 from clans import getClanEmbed
@@ -199,9 +199,26 @@ async def teams(ctx, idx):
                 title = "Balanced Teams",
                 color=11043122
             )
+            temp = ''
+            for player in red:
+                temp+= f"{player} "
+            redTeam = temp
+            temp = ''
+            for player in blue:
+                temp+= f"{player} "
+            blueTeam = temp
 
-            res = "Team: {}: Win Confidence {:.2f}\nTeam: {}: Win Confidence {:.2f}".format(red, red_p, blue, blue_p)
+            res = "Team (A): {}: Win Confidence {:.2f}\nTeam (B): {}: Win Confidence {:.2f}".format(redTeam, red_p, blueTeam, blue_p)
             embed.description = res
+
+            red_info = getTeamInformation(red, player_stats)
+            blue_info = getTeamInformation(blue, player_stats)
+
+            embed.add_field(name = 'Team A Information', value = getInfoSummary(red_info))
+            embed.add_field(name = 'Team B Information', value = getInfoSummary(blue_info))
+            
+
+
             await ctx.send(embed =embed)
 
 
