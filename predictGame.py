@@ -177,4 +177,12 @@ def predictAll(game, model, player_stats):
 
     return teams, probs
 
-        
+def getInfoSummary(info):
+    res = '''
+K/D = {}
+W/L = {}
+Kills/Gm = {}
+Caps/Gm = {}
+Base Damage/Gm = {}
+Elo = {}'''.format(info['k/d'],info['w/l'],info['kills/gm'],info['caps/gm'],info['baseDmg/gm'],info['elo'])
+    return res
