@@ -82,7 +82,7 @@ async def on_ready():
     chat.start(chat_channel)
 
     global model
-    model = pickle.load(open('uyaModel', 'rb'))
+    model = pickle.load(open('uyaModel.sav', 'rb'))
 
     global updatingOnlineMessage
     onlineThread = client.get_channel(ONLINE_CHANNEL)
