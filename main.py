@@ -247,7 +247,7 @@ async def teamsAll(ctx, idx):
             part = 1
             for sample in sort:
                 field+= "{} --> {:.1f}%\n".format(sample[0], sample[1]*100)
-                if len(field) > 900:
+                if len(field) > 1500:
                     embed.add_field(name=f"Win Probabilities Part {part}", value=field, inline=False)
                     part+=1
                     field = ''
