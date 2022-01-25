@@ -1,16 +1,7 @@
-from mongodb import Database
-from itertools import permutations, combinations
-import pickle
-import pandas as pd
+
+from itertools import combinations
 import numpy as np
 import uya_encodings
-# player_stats = Database("UYA","Player_Stats")
-# players_online = Database("UYA","Players_Online")
-# game_history = Database("UYA", "Game_History")
-# games_active = Database("UYA","Games_Active")
-
-# model_filename = 'uya_game_prediction(all modes).sav'
-# loaded_model = pickle.load(open(model_filename, 'rb'))
 
 def getTeamInformation(team, player_stats):
     info = {
@@ -33,8 +24,9 @@ def getTeamInformation(team, player_stats):
     }
     for player in team:
         name = player
+  
 
-        player = player_stats.collection.find_one({'username':player})
+        player = player_stats.collection.find_one({'username_lowercase':player.lower()})
         advanced = player['advanced_stats']
         player = player['stats']
         
