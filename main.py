@@ -421,7 +421,7 @@ async def clan(ctx, clan_name):
     if not clan:
         await ctx.send("```Clan Not Found```")
     else:
-        await ctx.send(embed = getClanEmbed(clan))
+        await ctx.send(embed = getClanEmbed(clan, player_stats))
 
 @tasks.loop(minutes=120)
 async def checkRoles():
