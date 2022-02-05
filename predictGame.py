@@ -2,7 +2,7 @@
 from itertools import combinations
 import numpy as np
 import uya_encodings
-
+import collections
 def getTeamInformation(team, player_stats):
     info = {
         'k/d':0,
@@ -178,3 +178,36 @@ Caps/Gm = {}
 Base Damage/Gm = {}
 Elo = {}'''.format(info['k/d'],info['w/l'],info['kills/gm'],info['caps/gm'],info['baseDmg/gm'],info['elo'])
     return res
+def predictCwar(clan1, clan2, model, player_stats):
+
+    red = [name for name in clan1['member_names']]
+    blue = [name for name in clan2['member_names']]
+
+    gamemode = uya_encodings.GAMEMODES['CTF']
+    map = uya_encodings.MAPS['Bakisi_Isle']
+    red_info = getTeamInformation(red, player_stats)
+    blue_info = getTeamInformation(blue, player_stats)
+
+    
+    data = np.array(list(red_info.values()))
+    data = data.astype(np.double)
+    red_x = data
+
+    data = np.array(list(blue_info.values()))
+    data = data.astype(np.double)
+    blue_x = data
+
+    for i, (redi, bluei) in enumerate(zip(red_x, blue_x)):
+        red_x[i], blue_x[i] = normalize(redi, bluei)
+
+    red_x = np.append(red_x, [gamemode, map])
+    blue_x = np.append(blue_x, [gamemode, map])
+
+    red_x = red_x.reshape(1, -1)
+    blue_x = blue_x.reshape(1, -1)
+    red_proba= model.predict_proba(red_x)
+
+    
+
+    
+    return {'name': clan1['clan_name'],'proba':red_proba[0][1]}, {'name': clan2['clan_name'],'proba':red_proba[0][0]}

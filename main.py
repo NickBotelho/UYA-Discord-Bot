@@ -15,7 +15,7 @@ from playThread import updatePlayEmbed, checkTime, time_slots, updateOnlineThrea
 from time import strftime, localtime, gmtime
 import time
 import copy
-from predictGame import predictGame, predictAll, getTeamInformation, getInfoSummary
+from predictGame import predictGame, predictAll, getTeamInformation, getInfoSummary, predictCwar
 import pickle
 from alts import getAlts
 from clans import getClanEmbed
@@ -220,7 +220,36 @@ async def teams(ctx, idx):
 
 
             await ctx.send(embed =embed)
+@client.command(brief = "<clan1> <clan2>")
+async def cwar(ctx, clan1, clan2):
+    global model
 
+    clan1 = clans.collection.find_one({"clan_name_lower":clan1.lower()})
+    clan2 = clans.collection.find_one({"clan_name_lower":clan2.lower()})
+
+    if not clan1 or not clan2:
+        #error
+        await ctx.send("```Clans not found```")
+    else:
+
+        clan1, clan2 = predictCwar(clan1, clan2, model, player_stats)
+        
+        embed = discord.Embed(
+            title = "Clan War Odds",
+            color=11043122
+        )
+
+
+        res = "{}: Win Confidence {:.2f}\n{}: Win Confidence {:.2f}".format(clan1['name'], clan1['proba'], clan2['name'], clan2['proba'])
+        embed.description = res
+
+
+        # embed.add_field(name = 'Team A Information', value = getInfoSummary(red_info))
+        # embed.add_field(name = 'Team B Information', value = getInfoSummary(blue_info))
+        
+
+
+        await ctx.send(embed =embed)
 
 @client.command(brief = "<0-indexed index of the active game>")
 async def teamsAll(ctx, idx):
