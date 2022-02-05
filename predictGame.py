@@ -206,8 +206,10 @@ def predictCwar(clan1, clan2, model, player_stats):
     red_x = red_x.reshape(1, -1)
     blue_x = blue_x.reshape(1, -1)
     red_proba= model.predict_proba(red_x)
+    blue_proba = model.predict_proba(blue_x)
 
     
 
     
-    return {'name': clan1['clan_name'],'proba':red_proba[0][1]}, {'name': clan2['clan_name'],'proba':red_proba[0][0]}
+    return {'name': clan1['clan_name'],'proba':red_proba[0][1], 'info':red_info}, \
+    {'name': clan2['clan_name'],'proba':red_proba[0][0], 'info':blue_info}

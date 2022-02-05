@@ -244,8 +244,8 @@ async def cwar(ctx, clan1, clan2):
         embed.description = res
 
 
-        # embed.add_field(name = 'Team A Information', value = getInfoSummary(red_info))
-        # embed.add_field(name = 'Team B Information', value = getInfoSummary(blue_info))
+        embed.add_field(name = f"{clan1['name']} Information", value = getInfoSummary(clan1['info']))
+        embed.add_field(name = f"{clan2['name']} Information", value = getInfoSummary(clan2['info']))
         
 
 
