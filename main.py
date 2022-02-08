@@ -1,4 +1,5 @@
 from logging import error
+from aiohttp import request
 from discord import player
 import discord
 from discord.ext import commands, tasks
@@ -21,6 +22,7 @@ from alts import getAlts
 from clans import getClanEmbed
 import json
 from discord.utils import get
+import requests
 
 os.environ['TZ'] = 'EST+05EDT,M4.1.0,M10.5.0'
 time.tzset()
@@ -366,7 +368,7 @@ async def alt(ctx, username):
 #     await ctx.send(embed = embed)
 
 
-@tasks.loop(minutes=1.0)
+@tasks.loop(minutes=5.0)
 async def daemon():
     # global smoke_cooldown
     # SMOKE_THRESHOLD = 4
@@ -388,6 +390,8 @@ async def daemon():
     commands = [onlineCalls, gameCalls, basicStatCalls, advancedStatCalls]
     api_analytics.updateDiscordAnalytics(commands)
     onlineCalls, gameCalls, basicStatCalls, advancedStatCalls = 0, 0, 0, 0
+
+    res = requests.get('https://uyatracker.herokuapp.com/api/online/players')
 
 @tasks.loop(minutes=0.5)
 async def chat(chat_channel):
