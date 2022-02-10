@@ -1,9 +1,13 @@
 import discord
 import requests
 from requests.api import get
-ALT_API = 'https://uya.raconline.gg/tapi/robo/alts'
+ALT_API = 'http://54.189.126.108:8281//robo/alts'
 
 def getAlts(username):
+    # old = None
+    # if username.lower() == "mchief":
+    #     old = username
+    #     username = 'matroo'
     url = f"{ALT_API}/{username}"
     res = requests.get(url)
     res = res.json()
@@ -15,6 +19,7 @@ def getAlts(username):
             alts+=f"- {alt}\n"
     else:
         alts = "Player NOT found...It just started tracking so maybe if you actually got on, you'd be in here"
+
 
     embed = discord.Embed(
     title = f"Accounts for: {username}",
