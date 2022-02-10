@@ -1,7 +1,7 @@
 import discord
 import requests
 from requests.api import get
-ALT_API = 'http://54.189.126.108:8281//robo/alts'
+ALT_API = 'http://54.189.126.108:8281/robo/alts'
 
 def getAlts(username):
     # old = None
