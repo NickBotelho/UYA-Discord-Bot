@@ -1,6 +1,7 @@
 import requests
 import discord
-
+import mongodb
+chat = mongodb.Database("UYA", "Chat")
 CHAT_API = 'http://107.155.81.113:8281/robo/chat'
 def getGameChat():
     res = requests.get(CHAT_API)
@@ -25,7 +26,10 @@ def getGameChat():
 def updateMessages(stack, message_history):
     res = requests.get(CHAT_API)
     res = res.json()
+    chat.collection.delete_many({})
     current_messages = [(message['ts'],message['message'], message['username']) for message in res]
+    dbEntry = {str(i):message for i, message in enumerate(current_messages)}
+    chat.collection.insert_one(dbEntry)
     for message in current_messages:
         if message not in stack and message not in message_history:
             stack.append(message)
